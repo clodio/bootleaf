@@ -391,10 +391,10 @@ $.getJSON("data/DOITT_MUSEUM_01_13SEPT2010.geojson", function (data) {
 });
 
 map = L.map("map", {
-  zoom: 10,
-  center: [40.702222, -73.979378],
-  layers: [mapquestOSM, boroughs, markerClusters, highlight],
-  zoomControl: false,
+  zoom: 6,
+  center: [46.9996919,3.1241694],
+  layers: [mapquestOSM, departments, markerClusters, highlight],
+  zoomControl: true,
   attributionControl: false
 });
 
@@ -475,9 +475,9 @@ var locateControl = L.control.locate({
   icon: "fa fa-location-arrow",
   metric: false,
   strings: {
-    title: "My location",
-    popup: "You are within {distance} {unit} from this point",
-    outsideMapBoundsMsg: "You seem located outside the boundaries of the map"
+    title: "Votre localisation",
+    popup: "Vous êtes situés à peut près à {distance} {unit} de ce point",
+    outsideMapBoundsMsg: "Vous êtes en dehors de cette carte"
   },
   locateOptions: {
     maxZoom: 18,
@@ -538,7 +538,7 @@ $(document).one("ajaxStop", function () {
   $("#loading").hide();
   sizeLayerControl();
   /* Fit map to boroughs bounds */
-  map.fitBounds(boroughs.getBounds());
+  //map.fitBounds(boroughs.getBounds());
   featureList = new List("features", {valueNames: ["feature-name"]});
   featureList.sort("feature-name", {order:"asc"});
 
