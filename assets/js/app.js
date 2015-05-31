@@ -166,7 +166,7 @@ var departments = L.geoJson(null, {
       color: "green",
       fill: false,
       opacity: 0.4,
-      width: 3,
+      width: 2,
       clickable: false
     };
   },
@@ -300,9 +300,10 @@ $.getJSON("data/subways.geojson", function (data) {
 /* Single marker cluster layer to hold all clusters */
 var markerClusters = new L.MarkerClusterGroup({
   spiderfyOnMaxZoom: true,
-  showCoverageOnHover: false,
+  showCoverageOnHover: true,
   zoomToBoundsOnClick: true,
-  disableClusteringAtZoom: 16
+  disableClusteringAtZoom: 16,
+  maxClusterRadius: 30
 });
 
 /* Empty layer placeholder to add to layer control for listening when to add/remove theaters to markerClusters layer */
