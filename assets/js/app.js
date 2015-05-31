@@ -1,4 +1,4 @@
-var map, featureList, boroughSearch = [], departmentSearch = [], theaterSearch = [], museumSearch = [];
+var map, featureList, boroughSearch = [], departmentSearch = [], theaterSearch = [], postboxSearch = [], museumSearch = [];
 
 $(window).resize(function() {
   sizeLayerControl();
@@ -345,8 +345,57 @@ var theaters = L.geoJson(null, {
 });
 $.getJSON("data/DOITT_THEATER_01_13SEPT2010.geojson", function (data) {
   theaters.addData(data);
-  map.addLayer(theaterLayer);
+  //map.addLayer(theaterLayer);
 });
+
+
+
+/* Empty layer placeholder to add to layer control for listening when to add/remove post box to markerClusters layer */
+var postboxLayer = L.geoJson(null);
+var postboxes = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+    return L.marker(latlng, {
+      icon: L.icon({
+        iconUrl: "assets/img/postbox.png",
+        iconSize: [24, 28],
+        iconAnchor: [12, 28],
+        popupAnchor: [0, -25]
+      }),
+      title: feature.properties.user,
+      riseOnHover: true
+    });
+  },
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>ref</th><td>" + feature.properties.ref + "</td></tr>" + "<tr><th>Utilisateur openstreetmap</th><td>" + feature.properties.user + "</td></tr>" + "<tr><th>Relève</th><td>" + feature.properties.collection_times + "</td></tr>" + "<table>";
+      layer.on({
+        click: function (e) {
+          $("#feature-title").html(feature.properties.user);
+          $("#feature-info").html(content);
+          $("#featureModal").modal("show");
+          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+        }
+      });
+      $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/postbox.png"></td><td class="feature-name">' + layer.feature.properties.user + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+      postboxSearch.push({
+        user: layer.feature.properties.user,
+        collection_times: layer.feature.properties.collection_times,
+ 	ref: layer.feature.properties.ref,
+        source: "Postboxes",
+        id: L.stamp(layer),
+        lat: layer.feature.geometry.coordinates[1],
+        lng: layer.feature.geometry.coordinates[0]
+      });
+    }
+  }
+});
+// CORS error : $.getJSON("http://public.opendatasoft.com/explore/dataset/points-dinterets-openstreetmap-en-france/download/?format=geojson&refine.operator=La%20Poste&refine.amenity=post_box&timezone=Europe/Berlin", function (data) {
+$.getJSON("data/postboxes.geojson", function (data) {
+  postboxes.addData(data);
+  //map.addLayer(postboxLayer);
+});
+
+
 
 /* Empty layer placeholder to add to layer control for listening when to add/remove museums to markerClusters layer */
 var museumLayer = L.geoJson(null);
@@ -404,6 +453,10 @@ map.on("overlayadd", function(e) {
     markerClusters.addLayer(theaters);
     syncSidebar();
   }
+  if (e.layer === postboxLayer) {
+    markerClusters.addLayer(postboxes);
+    syncSidebar();
+  }
   if (e.layer === museumLayer) {
     markerClusters.addLayer(museums);
     syncSidebar();
@@ -413,6 +466,10 @@ map.on("overlayadd", function(e) {
 map.on("overlayremove", function(e) {
   if (e.layer === theaterLayer) {
     markerClusters.removeLayer(theaters);
+    syncSidebar();
+  }
+  if (e.layer === postboxLayer) {
+    markerClusters.removeLayer(postboxes);
     syncSidebar();
   }
   if (e.layer === museumLayer) {
@@ -504,6 +561,7 @@ var baseLayers = {
 var groupedOverlays = {
   "Points d'interêts": {
     "<img src='assets/img/theater.png' width='24' height='28'>&nbsp;Theaters": theaterLayer,
+    "<img src='assets/img/postbox.png' width='24' height='28'>&nbsp;Boites jaunes": postboxLayer,
     "<img src='assets/img/museum.png' width='24' height='28'>&nbsp;Museums": museumLayer
   },
   "Réference": {
@@ -572,6 +630,16 @@ $(document).one("ajaxStop", function () {
     limit: 10
   });
 
+  var postboxesBH = new Bloodhound({
+    name: "BoitesJaunes",
+    datumTokenizer: function (d) {
+      return Bloodhound.tokenizers.whitespace(d.name);
+    },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    local: postboxSearch,
+    limit: 10
+  });
+
   var museumsBH = new Bloodhound({
     name: "Musées",
     datumTokenizer: function (d) {
@@ -615,6 +683,7 @@ $(document).one("ajaxStop", function () {
   boroughsBH.initialize();
   departmentsBH.initialize();
   theatersBH.initialize();
+  postboxesBH.initialize();
   museumsBH.initialize();
   geonamesBH.initialize();
 
@@ -646,6 +715,14 @@ $(document).one("ajaxStop", function () {
       suggestion: Handlebars.compile(["{{name}}<br>&nbsp;<small>{{address}}</small>"].join(""))
     }
   }, {
+    name: "Postboxes",
+    displayKey: "name",
+    source: postboxesBH.ttAdapter(),
+    templates: {
+      header: "<h4 class='typeahead-header'><img src='assets/img/postbox.png' width='24' height='28'>&nbsp;Boites Jaunes</h4>",
+      suggestion: Handlebars.compile(["{{name}}<br>&nbsp;<small>{{user}}</small>"].join(""))
+    }
+  }, {
     name: "Museums",
     displayKey: "name",
     source: museumsBH.ttAdapter(),
@@ -670,6 +747,15 @@ $(document).one("ajaxStop", function () {
     if (datum.source === "Theaters") {
       if (!map.hasLayer(theaterLayer)) {
         map.addLayer(theaterLayer);
+      }
+      map.setView([datum.lat, datum.lng], 17);
+      if (map._layers[datum.id]) {
+        map._layers[datum.id].fire("click");
+      }
+    }
+   if (datum.source === "Postboxes") {
+      if (!map.hasLayer(postboxLayer)) {
+        map.addLayer(postboxLayer);
       }
       map.setView([datum.lat, datum.lng], 17);
       if (map._layers[datum.id]) {
