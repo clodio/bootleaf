@@ -1,4 +1,4 @@
-var map, featureList, boroughSearch = [], theaterSearch = [], museumSearch = [];
+var map, featureList, boroughSearch = [], departmentSearch = [], theaterSearch = [], museumSearch = [];
 
 $(window).resize(function() {
   sizeLayerControl();
@@ -99,6 +99,7 @@ function syncSidebar() {
       }
     }
   });
+
   /* Update list.js featureList */
   featureList = new List("features", {
     valueNames: ["feature-name"]
@@ -157,6 +158,29 @@ var boroughs = L.geoJson(null, {
 });
 $.getJSON("data/boroughs.geojson", function (data) {
   boroughs.addData(data);
+});
+
+var departments = L.geoJson(null, {
+  style: function (feature) {
+    return {
+      color: "green",
+      fill: false,
+      opacity: 0.4,
+      width: 3,
+      clickable: false
+    };
+  },
+  onEachFeature: function (feature, layer) {
+    departmentSearch.push({
+      name: layer.feature.properties.departmentName,
+      source: "Départements",
+      id: L.stamp(layer),
+      bounds: layer.getBounds()
+    });
+  }
+});
+$.getJSON("data/departement.geojson", function (data) {
+  departments.addData(data);
 });
 
 var subwayLines = L.geoJson(null, {
@@ -484,6 +508,7 @@ var groupedOverlays = {
   },
   "Réference": {
     "Arrondissements": boroughs,
+    "Départements": departments,
     "Transports en communs": subwayLines
   }
 };
@@ -524,6 +549,16 @@ $(document).one("ajaxStop", function () {
     },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     local: boroughSearch,
+    limit: 10
+  });
+
+ var departmentsBH = new Bloodhound({
+    name: "Départements",
+    datumTokenizer: function (d) {
+      return Bloodhound.tokenizers.whitespace(d.name);
+    },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    local: departmentSearch,
     limit: 10
   });
 
@@ -578,6 +613,7 @@ $(document).one("ajaxStop", function () {
     limit: 10
   });
   boroughsBH.initialize();
+  departmentsBH.initialize();
   theatersBH.initialize();
   museumsBH.initialize();
   geonamesBH.initialize();
@@ -593,6 +629,13 @@ $(document).one("ajaxStop", function () {
     source: boroughsBH.ttAdapter(),
     templates: {
       header: "<h4 class='typeahead-header'>Boroughs</h4>"
+    }
+  }, {
+    name: "Departments",
+    displayKey: "name",
+    source: boroughsBH.ttAdapter(),
+    templates: {
+      header: "<h4 class='typeahead-header'>Départements</h4>"
     }
   }, {
     name: "Theaters",
@@ -619,6 +662,9 @@ $(document).one("ajaxStop", function () {
     }
   }).on("typeahead:selected", function (obj, datum) {
     if (datum.source === "Boroughs") {
+      map.fitBounds(datum.bounds);
+    }
+    if (datum.source === "Arrondissements") {
       map.fitBounds(datum.bounds);
     }
     if (datum.source === "Theaters") {
