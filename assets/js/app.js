@@ -149,7 +149,7 @@ var boroughs = L.geoJson(null, {
   onEachFeature: function (feature, layer) {
     boroughSearch.push({
       name: layer.feature.properties.BoroName,
-      source: "Boroughs",
+      source: "Arrondissements",
       id: L.stamp(layer),
       bounds: layer.getBounds()
     });
@@ -241,7 +241,7 @@ var subwayLines = L.geoJson(null, {
   },
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Division</th><td>" + feature.properties.Division + "</td></tr>" + "<tr><th>Line</th><td>" + feature.properties.Line + "</td></tr>" + "<table>";
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Division</th><td>" + feature.properties.Division + "</td></tr>" + "<tr><th>Ligne</th><td>" + feature.properties.Line + "</td></tr>" + "<table>";
       layer.on({
         click: function (e) {
           $("#feature-title").html(feature.properties.Line);
@@ -472,19 +472,19 @@ if (document.body.clientWidth <= 767) {
 }
 
 var baseLayers = {
-  "Street Map": mapquestOSM,
-  "Aerial Imagery": mapquestOAM,
-  "Imagery with Streets": mapquestHYB
+  "Plan": mapquestOSM,
+  "Carte satellite": mapquestOAM,
+  "Carte avec rues": mapquestHYB
 };
 
 var groupedOverlays = {
-  "Points of Interest": {
+  "Points d'interêts": {
     "<img src='assets/img/theater.png' width='24' height='28'>&nbsp;Theaters": theaterLayer,
     "<img src='assets/img/museum.png' width='24' height='28'>&nbsp;Museums": museumLayer
   },
-  "Reference": {
-    "Boroughs": boroughs,
-    "Subway Lines": subwayLines
+  "Réference": {
+    "Arrondissements": boroughs,
+    "Transports en communs": subwayLines
   }
 };
 
@@ -518,7 +518,7 @@ $(document).one("ajaxStop", function () {
   featureList.sort("feature-name", {order:"asc"});
 
   var boroughsBH = new Bloodhound({
-    name: "Boroughs",
+    name: "Arrondissements",
     datumTokenizer: function (d) {
       return Bloodhound.tokenizers.whitespace(d.name);
     },
@@ -528,7 +528,7 @@ $(document).one("ajaxStop", function () {
   });
 
   var theatersBH = new Bloodhound({
-    name: "Theaters",
+    name: "Théatres",
     datumTokenizer: function (d) {
       return Bloodhound.tokenizers.whitespace(d.name);
     },
@@ -538,7 +538,7 @@ $(document).one("ajaxStop", function () {
   });
 
   var museumsBH = new Bloodhound({
-    name: "Museums",
+    name: "Musées",
     datumTokenizer: function (d) {
       return Bloodhound.tokenizers.whitespace(d.name);
     },

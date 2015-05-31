@@ -35,36 +35,36 @@
             <a href="#" class="navbar-icon pull-right visible-xs" id="nav-btn"><i class="fa fa-bars fa-lg white"></i></a>
             <a href="#" class="navbar-icon pull-right visible-xs" id="sidebar-toggle-btn"><i class="fa fa-search fa-lg white"></i></a>
           </div>
-          <a class="navbar-brand" href="#">BootLeaf</a>
+          <a class="navbar-brand" href="#">PosteMaps</a>
         </div>
         <div class="navbar-collapse collapse">
           <form class="navbar-form navbar-right" role="search">
             <div class="form-group has-feedback">
-                <input id="searchbox" type="text" placeholder="Search" class="form-control">
+                <input id="searchbox" type="text" placeholder="Rechercher" class="form-control">
                 <span id="searchicon" class="fa fa-search form-control-feedback"></span>
             </div>
           </form>
           <ul class="nav navbar-nav">
-            <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn"><i class="fa fa-question-circle white"></i>&nbsp;&nbsp;About</a></li>
+            <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn"><i class="fa fa-question-circle white"></i>&nbsp;&nbsp;A propos</a></li>
             <li class="dropdown">
-              <a id="toolsDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-globe white"></i>&nbsp;&nbsp;Tools <b class="caret"></b></a>
+              <a id="toolsDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-globe white"></i>&nbsp;&nbsp;Outils <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="full-extent-btn"><i class="fa fa-arrows-alt"></i>&nbsp;&nbsp;Zoom To Full Extent</a></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="legend-btn"><i class="fa fa-picture-o"></i>&nbsp;&nbsp;Show Legend</a></li>
+                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="full-extent-btn"><i class="fa fa-arrows-alt"></i>&nbsp;&nbsp;Zoomer sur les données</a></li>
+                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="legend-btn"><i class="fa fa-picture-o"></i>&nbsp;&nbsp;Afficher Legende</a></li>
                 <li class="divider hidden-xs"></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="login-btn"><i class="fa fa-user"></i>&nbsp;&nbsp;Login</a></li>
+                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="login-btn"><i class="fa fa-user"></i>&nbsp;&nbsp;Connexion</a></li>
               </ul>
             </li>
             <li class="dropdown">
-                <a class="dropdown-toggle" id="downloadDrop" href="#" role="button" data-toggle="dropdown"><i class="fa fa-cloud-download white"></i>&nbsp;&nbsp;Download <b class="caret"></b></a>
+                <a class="dropdown-toggle" id="downloadDrop" href="#" role="button" data-toggle="dropdown"><i class="fa fa-cloud-download white"></i>&nbsp;&nbsp;Télécharger <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="data/boroughs.geojson" download="boroughs.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Boroughs</a></li>
-                  <li><a href="data/subways.geojson" download="subways.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Subway Lines</a></li>
-                  <li><a href="data/DOITT_THEATER_01_13SEPT2010.geojson" download="theaters.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Theaters</a></li>
-                  <li><a href="data/DOITT_MUSEUM_01_13SEPT2010.geojson" download="museums.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Museums</a></li>
+                  <li><a href="data/boroughs.geojson" download="boroughs.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Arrondissements</a></li>
+                  <li><a href="data/subways.geojson" download="subways.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Transports en communs</a></li>
+                  <li><a href="data/DOITT_THEATER_01_13SEPT2010.geojson" download="theaters.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Théatres</a></li>
+                  <li><a href="data/DOITT_MUSEUM_01_13SEPT2010.geojson" download="museums.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Musées</a></li>
                 </ul>
             </li>
-            <li class="hidden-xs"><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="list-btn"><i class="fa fa-list white"></i>&nbsp;&nbsp;POI List</a></li>
+            <li class="hidden-xs"><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="list-btn"><i class="fa fa-list white"></i>&nbsp;&nbsp;Points d'intérets</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
       </div>
@@ -75,16 +75,16 @@
         <div class="sidebar-wrapper">
           <div class="panel panel-default" id="features">
             <div class="panel-heading">
-              <h3 class="panel-title">Points of Interest
+              <h3 class="panel-title">Points d'intérets
               <button type="button" class="btn btn-xs btn-default pull-right" id="sidebar-hide-btn"><i class="fa fa-chevron-left"></i></button></h3>
             </div>
             <div class="panel-body">
               <div class="row">
                 <div class="col-xs-8 col-md-8">
-                  <input type="text" class="form-control search" placeholder="Filter" />
+                  <input type="text" class="form-control search" placeholder="Filtrer les résultats" />
                 </div>
                 <div class="col-xs-4 col-md-4">
-                  <button type="button" class="btn btn-primary pull-right sort" data-sort="feature-name" id="sort-btn"><i class="fa fa-sort"></i>&nbsp;&nbsp;Sort</button>
+                  <button type="button" class="btn btn-primary pull-right sort" data-sort="feature-name" id="sort-btn"><i class="fa fa-sort"></i>&nbsp;&nbsp;Trier</button>
                 </div>
               </div>
             </div>
@@ -92,10 +92,10 @@
               <table class="table table-hover" id="feature-list">
                 <thead class="hidden">
                   <tr>
-                    <th>Icon</th>
+                    <th>Icône</th>
                   <tr>
                   <tr>
-                    <th>Name</th>
+                    <th>Nom</th>
                   <tr>
                   <tr>
                     <th>Chevron</th>
@@ -122,20 +122,20 @@
         <div class="modal-content">
           <div class="modal-header">
             <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">Welcome to the BootLeaf template!</h4>
+            <h4 class="modal-title">Bienvenue sur PosteMaps!</h4>
           </div>
           <div class="modal-body">
             <ul class="nav nav-tabs" id="aboutTabs">
-              <li class="active"><a href="#about" data-toggle="tab"><i class="fa fa-question-circle"></i>&nbsp;About the project</a></li>
-              <li><a href="#contact" data-toggle="tab"><i class="fa fa-envelope"></i>&nbsp;Contact us</a></li>
-              <li><a href="#disclaimer" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Disclaimer</a></li>
+              <li class="active"><a href="#about" data-toggle="tab"><i class="fa fa-question-circle"></i>&nbsp;A propos du projet</a></li>
+              <li><a href="#contact" data-toggle="tab"><i class="fa fa-envelope"></i>&nbsp;Contactez-nous</a></li>
+              <li><a href="#disclaimer" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Mentions</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-globe"></i>&nbsp;Metadata <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="#boroughs-tab" data-toggle="tab">Boroughs</a></li>
-                  <li><a href="#subway-lines-tab" data-toggle="tab">Subway Lines</a></li>
-                  <li><a href="#theaters-tab" data-toggle="tab">Theaters</a></li>
-                  <li><a href="#museums-tab" data-toggle="tab">Museums</a></li>
+                  <li><a href="#boroughs-tab" data-toggle="tab">Arrondissements</a></li>
+                  <li><a href="#subway-lines-tab" data-toggle="tab">Transports en commun</a></li>
+                  <li><a href="#theaters-tab" data-toggle="tab">Théatres</a></li>
+                  <li><a href="#museums-tab" data-toggle="tab">Musées</a></li>
                 </ul>
               </li>
             </ul>
@@ -155,8 +155,7 @@
                 </div>
               </div>
               <div id="disclaimer" class="tab-pane fade text-danger">
-                <p>The data provided on this site is for informational and planning purposes only.</p>
-                <p>Absolutely no accuracy or completeness guarantee is implied or intended. All information on this map is subject to such variations and corrections as might result from a complete title search and/or accurate field survey.</p>
+                <p>Les données présentées sont fournies à titre d'exemple.</p>
               </div>
               <div class="tab-pane fade" id="contact">
                 <form id="contact-form">
@@ -164,11 +163,11 @@
                     <div class="row">
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="first-name">First Name:</label>
+                          <label for="first-name">Prénom:</label>
                           <input type="text" class="form-control" id="first-name">
                         </div>
                         <div class="form-group">
-                          <label for="last-name">Last Name:</label>
+                          <label for="last-name">Nom:</label>
                           <input type="text" class="form-control" id="last-email">
                         </div>
                         <div class="form-group">
@@ -182,7 +181,7 @@
                       </div>
                       <div class="col-md-12">
                         <p>
-                          <button type="submit" class="btn btn-primary pull-right" data-dismiss="modal">Submit</button>
+                          <button type="submit" class="btn btn-primary pull-right" data-dismiss="modal">Valider</button>
                         </p>
                       </div>
                     </div>
@@ -190,7 +189,7 @@
                 </form>
               </div>
               <div class="tab-pane fade" id="boroughs-tab">
-                <p>Borough data courtesy of <a href="http://www.nyc.gov/html/dcp/html/bytes/meta_dis_nyboroughwi.shtml" target="_blank">New York City Department of City Planning</a></p>
+                <p><a href="https://www.data.gouv.fr/fr/datasets/geoflar-arrondissements/" target="_blank">Arrondisements Geofla</a></p>
               </div>
               <div class="tab-pane fade" id="subway-lines-tab">
                 <p><a href="http://spatialityblog.com/2010/07/08/mta-gis-data-update/#datalinks" target="_blank">MTA Subway data</a> courtesy of the <a href="http://www.urbanresearch.org/about/cur-components/cuny-mapping-service" target="_blank">CUNY Mapping Service at the Center for Urban Research</a></p>
@@ -215,13 +214,13 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">Map Legend</h4>
+            <h4 class="modal-title">Legende</h4>
           </div>
           <div class="modal-body">
-            <p>Map Legend goes here...</p>
+            <p>La légende est ici...</p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
@@ -232,25 +231,25 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">Login</h4>
+            <h4 class="modal-title">Connexion</h4>
           </div>
           <div class="modal-body">
             <form id="contact-form">
               <fieldset>
                 <div class="form-group">
-                  <label for="name">Username:</label>
-                  <input type="text" class="form-control" id="username">
+                  <label for="name">idRH:</label>
+                  <input type="text" class="form-control" id="username" PlaceHolder="7 caractères ex :pWYH295">
                 </div>
                 <div class="form-group">
-                  <label for="email">Password:</label>
+                  <label for="email">Mot de passe:</label>
                   <input type="password" class="form-control" id="password">
                 </div>
               </fieldset>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-primary" data-dismiss="modal">Login</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary" data-dismiss="modal">Valider</button>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
@@ -265,7 +264,7 @@
           </div>
           <div class="modal-body" id="feature-info"></div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
@@ -277,7 +276,7 @@
           <div class="modal-header">
             <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h4 class="modal-title">
-              Developed by <a href='http://bryanmcbride.com'>bryanmcbride.com</a>
+              Réalisé par clodio à partir de <a href='http://bryanmcbride.com'>bryanmcbride.com</a>
             </h4>
           </div>
           <div class="modal-body">
