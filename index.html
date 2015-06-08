@@ -11,6 +11,7 @@
     <meta name="author" content="">
     <title>BootLeaf</title>
 
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css">
@@ -18,6 +19,8 @@
     <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css">
     <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.css">
     <link rel="stylesheet" href="assets/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.css">
+    <link rel="stylesheet" href="assets/css/leaflet.rrose.css">
+
     <link rel="stylesheet" href="assets/css/app.css">
 
     <link rel="apple-touch-icon" sizes="76x76" href="assets/img/favicon-76.png">
@@ -48,21 +51,69 @@
             <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn"><i class="fa fa-question-circle white"></i>&nbsp;&nbsp;A propos</a></li>
             <li class="dropdown">
               <a id="toolsDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-globe white"></i>&nbsp;&nbsp;Outils <b class="caret"></b></a>
-              <ul class="dropdown-menu">
+              <ul class="dropdown-menu" style="width:374px">
                 <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="full-extent-btn"><i class="fa fa-arrows-alt"></i>&nbsp;&nbsp;Zoomer sur les données</a></li>
                 <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="legend-btn"><i class="fa fa-picture-o"></i>&nbsp;&nbsp;Afficher Legende</a></li>
+		<li class="divider hidden-xs"></li>
+                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="data"><form id="request-form" method="GET" action="/"><label for="message"><i class="fa fa-code"></i>&nbsp;&nbsp;Requête:</label>
+
+                  <div class="wells well-sms">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <input type="hidden" id="style_map_color" name="style_map_color" value=""/>
+			<input type="hidden" id="style_map_size" name="style_map_size" value=""/>
+			<input type="hidden" id="heatmap_blur" name="heatmap_blur" value=""/>
+			<input type="hidden" id="heatmap_radius" name="heatmap_radius" value=""/>
+			<input type="hidden" id="url" name="url" value=""/>
+                        <textarea class="form-control" rows="8" id="data_request" name="data_request">{
+  "query": {
+    "filtered": {
+      "query": {
+        "query_string": {
+          "analyze_wildcard": true,
+          "query": "*"
+        }
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "gte": "2000-06-18",
+                  "lte": "now-1d"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      }
+    }
+  },
+  "size": 0,
+  "aggs": {
+    "my_agg": {
+      "terms": {
+        "field": "bytes.raw"
+      }
+    }
+  }
+}</textarea>
+                      </div>
+                      <div class="col-md-12">
+                        <p>
+                          <button type="submit" class="btn btn-primary pull-right" id="validate_request" >Valider</button>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+
+</li>
                 <li class="divider hidden-xs"></li>
                 <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="login-btn"><i class="fa fa-user"></i>&nbsp;&nbsp;Connexion</a></li>
               </ul>
-            </li>
-            <li class="dropdown">
-                <a class="dropdown-toggle" id="downloadDrop" href="#" role="button" data-toggle="dropdown"><i class="fa fa-cloud-download white"></i>&nbsp;&nbsp;Télécharger <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li><a href="data/boroughs.geojson" download="boroughs.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Arrondissements</a></li>
-                  <li><a href="data/subways.geojson" download="subways.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Transports en communs</a></li>
-                  <li><a href="data/DOITT_THEATER_01_13SEPT2010.geojson" download="theaters.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Théatres</a></li>
-                  <li><a href="data/DOITT_MUSEUM_01_13SEPT2010.geojson" download="museums.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Musées</a></li>
-                </ul>
             </li>
             <li class="hidden-xs"><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="list-btn"><i class="fa fa-list white"></i>&nbsp;&nbsp;Points d'intérets</a></li>
           </ul>
@@ -129,15 +180,7 @@
               <li class="active"><a href="#about" data-toggle="tab"><i class="fa fa-question-circle"></i>&nbsp;A propos du projet</a></li>
               <li><a href="#contact" data-toggle="tab"><i class="fa fa-envelope"></i>&nbsp;Contactez-nous</a></li>
               <li><a href="#disclaimer" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Mentions</a></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-globe"></i>&nbsp;Metadata <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li><a href="#boroughs-tab" data-toggle="tab">Arrondissements</a></li>
-                  <li><a href="#subway-lines-tab" data-toggle="tab">Transports en commun</a></li>
-                  <li><a href="#theaters-tab" data-toggle="tab">Théatres</a></li>
-                  <li><a href="#museums-tab" data-toggle="tab">Musées</a></li>
-                </ul>
-              </li>
+              
             </ul>
             <div class="tab-content" id="aboutTabsContent">
               <div class="tab-pane fade active in" id="about">
@@ -151,6 +194,9 @@
                     <li class="list-group-item">Elegant client-side multi-layer feature search with autocomplete using <a href="http://twitter.github.io/typeahead.js/" target="_blank">typeahead.js</a></li>
                     <li class="list-group-item">Responsive sidebar feature list synced with map bounds, which includes sorting and filtering via <a href="http://listjs.com/" target="_blank">list.js</a></li>
                     <li class="list-group-item">Marker icons included in grouped layer control via the <a href="https://github.com/ismyrnow/Leaflet.groupedlayercontrol" target="_blank">grouped layer control plugin</a></li>
+<li class="list-group-item">Color data with style_map_color parameter : DIV6, DIV12, PiYG6</li>
+<li class="list-group-item">Size data with style_map_size parameter : LIN6,LIN10,POINT</li>
+<li class="list-group-item">heatmap with heatmap_blur and heatmap_radius parameter : 17, 20</li>
                   </ul>
                 </div>
               </div>
@@ -276,7 +322,7 @@
           <div class="modal-header">
             <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h4 class="modal-title">
-              Réalisé par clodio à partir de <a href='http://bryanmcbride.com'>bryanmcbride.com</a>
+              Réalisé par <a href="mailto:Claude.seguret@laposte.fr">clodio</a> à partir de <a href='http://bryanmcbride.com'>bryanmcbride.com</a>
             </h4>
           </div>
           <div class="modal-body">
@@ -295,6 +341,11 @@
     <script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.min.js"></script>
     <script src="assets/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/colorbrewer.v1.min.js"></script>
+    <script src="assets/js/leaflet-heat.js"></script>
+    <script src="assets/js/rrose-src.js"></script>
+
     <script src="assets/js/app.js"></script>
   </body>
 </html>

@@ -1,0 +1,8 @@
+{"type": "FeatureCollection", "features": [
+{"type": "Feature","properties": {"regate_code": "010080","id": "7","entity_name": "AMBERIEU EN BUGEY PPDC","value": 0},"geometry": {"type":"Point","coordinates": [5.342109,45.966319]}},
+{"type": "Feature","properties": {"regate_code": "033510","id": "604","entity_name": "MONTLUCON ENTREPRISES PPDC","value": 0},"geometry": {"type":"Point","coordinates": [2.6027714,46.3522319]}},
+{"type": "Feature","properties": {"regate_code": "049650","id": "713","entity_name": "DIGNE LES BAINS PPDC","value": 0},"geometry": {"type":"Point","coordinates": [6.1929881,44.0776553]}},
+{"type": "Feature","properties": {"regate_code": "059650","id": "810","entity_name": "GAP PPDC","value": 0},"geometry": {"type":"Point","coordinates": [6.0601059,44.5480758]}},
+{"type": "Feature","properties": {"regate_code": "060360","id": "845","entity_name": "CANNES PPDC","value": 0},"geometry": {"type":"Point","coordinates": [6.9567485,43.5538172]}},
+{"type": "Feature","properties": {"regate_code": "060390","id": "848","entity_name": "MOUGINS LE CANNET PDC1","value": 0},"geometry": {"type":"Point","coordinates": [6.992583,43.579023]}}
+]}

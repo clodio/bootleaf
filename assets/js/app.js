@@ -1,4 +1,7 @@
-var map, featureList, boroughSearch = [], departmentSearch = [], theaterSearch = [], postboxSearch = [], museumSearch = [];
+var map, featureList, boroughSearch = [],  siteSearch = [],site_dataSearch = [];
+
+
+
 
 $(window).resize(function() {
   sizeLayerControl();
@@ -6,7 +9,7 @@ $(window).resize(function() {
 
 $(document).on("click", ".feature-row", function(e) {
   $(document).off("mouseout", ".feature-row", clearHighlight);
-  sidebarClick(parseInt($(this).attr("id"), 10));
+  sidebarClick(parseInt($(this).attr("id"), 10), $(this).attr("lat"), $(this).attr("lng"));
 });
 
 $(document).on("mouseover", ".feature-row", function(e) {
@@ -69,10 +72,44 @@ function clearHighlight() {
   highlight.clearLayers();
 }
 
-function sidebarClick(id) {
-  var layer = markerClusters.getLayer(id);
-  map.setView([layer.getLatLng().lat, layer.getLatLng().lng], 17);
-  layer.fire("click");
+
+function getURLParameter(sParam) {
+
+  var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) 
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) 
+        {
+            return sParameterName[1];
+        }
+    }
+}
+$( document ).ready(function() {
+  // Handler for .ready() called.
+
+$('#style_map_color').val(getURLParameter('style_map_color'));
+$('#style_map_size').val(getURLParameter('style_map_size'));
+$('#heatmap_blur').val(getURLParameter('heatmap_blur'));
+$('#heatmap_radius').val(getURLParameter('heatmap_radius'));
+if (typeof(getURLParameter('url')) != "undefined" &&  getURLParameter('url') != "" ) {
+	$('#url').val(decodeURIComponent(getURLParameter('url')));
+}
+});
+
+function sidebarClick(id, lat, lng) {
+
+  
+  if (lat) {
+     map.setView([lat, lng], 17);
+  }
+  else{
+	var layer = markerClusters.getLayer(id);
+     	map.setView([layer.getLatLng().lat, layer.getLatLng().lng], 17);
+	layer.fire("click");
+  }
+  
   /* Hide sidebar and go to the map on small screens */
   if (document.body.clientWidth <= 767) {
     $("#sidebar").hide();
@@ -83,22 +120,16 @@ function sidebarClick(id) {
 function syncSidebar() {
   /* Empty sidebar features */
   $("#feature-list tbody").empty();
-  /* Loop through theaters layer and add only features which are in the map bounds */
-  theaters.eachLayer(function (layer) {
-    if (map.hasLayer(theaterLayer)) {
+  
+/* Loop through site_data layer and add only features which are in the map bounds */
+  site_datas.eachLayer(function (layer) {
+    if (map.hasLayer(site_dataLayer)) {
       if (map.getBounds().contains(layer.getLatLng())) {
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/theater.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/factory.png"></td><td class="feature-name">' + layer.feature.properties.regate_code + ' ' + layer.feature.properties.entity_name + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       }
     }
   });
-  /* Loop through museums layer and add only features which are in the map bounds */
-  museums.eachLayer(function (layer) {
-    if (map.hasLayer(museumLayer)) {
-      if (map.getBounds().contains(layer.getLatLng())) {
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/museum.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
-      }
-    }
-  });
+  
 
   /* Update list.js featureList */
   featureList = new List("features", {
@@ -120,6 +151,41 @@ var mapquestOAM = L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.
   subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"],
   attribution: 'Tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>. Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency'
 });
+
+var LMappopulation = new L.TileLayer("http://www.comeetie.fr/mbtiles-php/CarreauxPopShpSmall/{z}/{x}/{y}.png", {
+	minZoom : 6,
+	maxZoom : 9,
+	attribution: '<a href="http://www.insee.fr/fr/themes/detail.asp?reg_id=0&ref_id=donnees-carroyees&page=donnees-detaillees/donnees-carroyees/donnees-carroyees-200m.htm">INSEE</a>'
+});
+
+var LMapIncomes = new L.TileLayer("http://www.comeetie.fr/mbtiles-php/CarreauxRevShpSmall/{z}/{x}/{y}.png", {
+	minZoom : 6,
+	maxZoom : 9,
+	attribution: '<a href="http://www.insee.fr/fr/themes/detail.asp?reg_id=0&ref_id=donnees-carroyees&page=donnees-detaillees/donnees-carroyees/donnees-carroyees-200m.htm">INSEE</a>'
+});
+
+var LMaplowIncomes = new L.TileLayer("http://www.comeetie.fr/mbtiles-php/CarreauxBslrShpSmall/{z}/{x}/{y}.png", {
+	minZoom : 6,
+	maxZoom : 9,
+	attribution: '<a href="http://www.insee.fr/fr/themes/detail.asp?reg_id=0&ref_id=donnees-carroyees&page=donnees-detaillees/donnees-carroyees/donnees-carroyees-200m.htm">INSEE</a>'
+});
+
+var LMapless25YearsOld = new L.TileLayer("http://www.comeetie.fr/mbtiles-php/CarreauxJeunesShpSmall/{z}/{x}/{y}.png", {
+	minZoom : 6,
+	maxZoom : 9,
+	attribution: '<a href="http://www.insee.fr/fr/themes/detail.asp?reg_id=0&ref_id=donnees-carroyees&page=donnees-detaillees/donnees-carroyees/donnees-carroyees-200m.htm">INSEE</a>'
+});
+
+var LMapplus65YearsOld = new L.TileLayer("http://www.comeetie.fr/mbtiles-php/CarreauxVieuxShpSmall/{z}/{x}/{y}.png", {
+	minZoom : 6,
+	maxZoom : 9,
+	attribution: '<a href="http://www.insee.fr/fr/themes/detail.asp?reg_id=0&ref_id=donnees-carroyees&page=donnees-detaillees/donnees-carroyees/donnees-carroyees-200m.htm">INSEE</a>'
+});
+
+		
+
+
+
 var mapquestHYB = L.layerGroup([L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg", {
   maxZoom: 18,
   subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"]
@@ -169,19 +235,15 @@ var departments = L.geoJson(null, {
       width: 2,
       clickable: false
     };
-  },
-  onEachFeature: function (feature, layer) {
-    departmentSearch.push({
-      name: layer.feature.properties.departmentName,
-      source: "Départements",
-      id: L.stamp(layer),
-      bounds: layer.getBounds()
-    });
   }
 });
 $.getJSON("data/departement.geojson", function (data) {
   departments.addData(data);
 });
+
+
+
+
 
 var subwayLines = L.geoJson(null, {
   style: function (feature) {
@@ -303,180 +365,470 @@ var markerClusters = new L.MarkerClusterGroup({
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true,
   disableClusteringAtZoom: 16,
-  maxClusterRadius: 30
+  maxClusterRadius: 80,
+  //iconCreateFunction: defineClusterIcon //this is where the magic happens http://bl.ocks.org/gisminister/10001728
 });
 
-/* Empty layer placeholder to add to layer control for listening when to add/remove theaters to markerClusters layer */
-var theaterLayer = L.geoJson(null);
-var theaters = L.geoJson(null, {
+
+
+
+
+
+
+
+
+
+
+
+
+/* Empty layer placeholder to add to layer control for listening when to add/remove data elasticsearch to markerClusters layer */
+//svg.select("#user_layer").attr("class", palette);
+// leaflet-zoom-animated
+/** add newe */
+function style(feature) {
+    return {
+        fillColor: getColor(feature.properties.value),
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.7
+    };
+}
+
+
+function getColor(d, style_map_color) {
+
+	if (getURLParameter('style_map_color')  ) {
+		style_map_color = getURLParameter('style_map_color');
+	}
+	else {
+		style_map_color = "PiYG6"
+	}
+	if (style_map_color == "PiYG6") {
+	    d=Math.round(d);
+	    return d > 80 ? '#8e0152' :
+		   d > 60  ? '#de77ae' :
+		   d > 40  ? '#fde0ef' :
+		   d > 20  ? '#b8e186' :
+		   d > 5   ? '#4dac26' :
+		              '#111';
+	}
+	if (style_map_color == "DIV6") {
+	    d=Math.round(d);
+	    return d > 80 ? '#8e0152' :
+		   d > 60  ? '#de77ae' :
+		   d > 40  ? '#fde0ef' :
+		   d > 20  ? '#b8e186' :
+		   d > 5   ? '#4dac26' :
+		              '#111';
+	}
+	if (style_map_color == "DIV12") {
+	    d=Math.round(d);
+	   return d > 95 ? '#8e0152' :
+		   d > 85  ? '#c51b7d' :
+		   d > 75  ? '#de77ae' :
+		   d > 65  ? '#f1b6da' :
+		   d > 55   ? '#fde0ef' :
+		   d > 45   ? '#f7f7f7' :
+		   d > 35   ? '#e6f5d0' :
+		   d > 25   ? '#b8e186' :
+		   d > 15   ? '#7fbc41' :
+		   d > 5   ? '#4d9221' :
+		              '#276419';
+	}
+    
+}
+
+
+
+
+function getCircleSize(d, style_map_size) {
+
+	if (getURLParameter('style_map_size')  ) {
+		style_map_size= getURLParameter('style_map_size');
+	}
+	else {
+		style_map_size = "LIN6";
+	}
+	if (style_map_size == "LIN6") {
+	    d=Math.round(d);
+	    return d > 80 ? 16 :
+		   d > 60  ? 14 :
+		   d > 40  ? 12 :
+		   d > 20  ? 10 :
+		   d > 5   ? 8 :
+		              3;
+	}
+	if (style_map_size == "POINT") {
+	    d=Math.round(d);
+	    return           3;
+	}
+       if (style_map_size == "LIN10") {
+	    d=Math.round(d);
+	    return d > 95 ? 18 :
+		   d > 85  ? 17 :
+		   d > 75  ? 16 :
+		   d > 65  ? 15 :
+		   d > 55   ? 14 :
+		   d > 45   ? 13 :
+		   d > 35   ? 11 :
+		   d > 25   ? 10 :
+		   d > 15   ? 9 :
+		   d > 5   ? 8 :
+		              3;
+	}
+}
+
+
+//L.geoJson(statesData, {style: style}).addTo(map);
+
+//var d3Layer = new L.GeoJSON.d3({...insert geojson here...});
+//var map = new L.Map("map").addLayer(d3Layer);
+
+var site_data_departmentLayer = L.geoJson(null);
+var site_data_departments = L.geoJson(null, {
   pointToLayer: function (feature, latlng) {
     return L.marker(latlng, {
       icon: L.icon({
-        iconUrl: "assets/img/theater.png",
+        //iconUrl: "assets/img/postbox.png",
         iconSize: [24, 28],
         iconAnchor: [12, 28],
         popupAnchor: [0, -25]
       }),
-      title: feature.properties.NAME,
+      title: feature.properties.NOM_DEPT,
       riseOnHover: true
     });
   },
+  style: function (feature) {
+    return {
+        fillColor: getColor(feature.properties.value_pct, 'DIV12'),
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.7,
+        clickable: true,
+        width: 1,
+    };
+  },
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.NAME + "</td></tr>" + "<tr><th>Phone</th><td>" + feature.properties.TEL + "</td></tr>" + "<tr><th>Address</th><td>" + feature.properties.ADDRESS1 + "</td></tr>" + "<tr><th>Website</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Code Département</th><td>" + feature.properties.CODE_DEPT + "</td></tr>" + "<tr><th>Département</th><td>" + feature.properties.NOM_DEPT + "</td></tr>" + "<tr><th>Value</th><td>" + feature.properties.value + "</td></tr>" + "<table>";
       layer.on({
         click: function (e) {
-          $("#feature-title").html(feature.properties.NAME);
+          $("#feature-title").html(feature.properties.NOM_DEPT);
           $("#feature-info").html(content);
           $("#featureModal").modal("show");
           highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
         }
       });
-      $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/theater.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
-      theaterSearch.push({
-        name: layer.feature.properties.NAME,
-        address: layer.feature.properties.ADDRESS1,
-        source: "Theaters",
-        id: L.stamp(layer),
-        lat: layer.feature.geometry.coordinates[1],
-        lng: layer.feature.geometry.coordinates[0]
-      });
+      //$("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/postbox.png"></td><td class="feature-name">' + layer.feature.properties.NOM_DEPT + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+      
     }
   }
 });
-$.getJSON("data/DOITT_THEATER_01_13SEPT2010.geojson", function (data) {
-  theaters.addData(data);
-  //map.addLayer(theaterLayer);
-});
+// CORS error + format : $.getJSON("http://public.opendatasoft.com/explore/dataset/points-dinterets-openstreetmap-en-france/download/?format=geojson&refine.operator=La%20Poste&refine.amenity=post_box&timezone=Europe/Berlin", function (data) {
+
+// Récupere les données cartographiques
+var site_data_department= $.getJSON( "data/departement.geojson", function() {
+
+})
+  .done(function(site_data_department) {
+
+	//récupere les données d'elasticsearch
+//	var data = $.getJSON( "data/sample_response_aggregation.geojson", function(site_data_department) {
+	var data = $.getJSON( "data/sample_CA_debut_2014.geojson", function(site_data_department) {
+
+
+	  console.log( "success_AGG" );
+	})
+	  .done(function(data) {
+
+	    console.log( "second success_AGG" );
+																																
+		var buckets = [];
+		var doc_count_total =0;
+		var doc_count_max =0; // used to add color
+		var doc_count_min =0; // used to add color
+		var doc_count_scale =0; // used to add color
+
+		// passe sous forme de tableau les données d'elasticsearch contenues dans le résultat aggregations, le tableau contient de departement (2pemiers car du regate)
+		var bucketsLength=data.aggregations.my_agg.buckets.length; 
+		for (var j=0; j<bucketsLength; j++) {
+			buckets[data.aggregations.my_agg.buckets[j].key.substring(0, 2)]=data.aggregations.my_agg.buckets[j].doc_count;
+			doc_count_total = doc_count_total+data.aggregations.my_agg.buckets[j].doc_count;
+			if ( data.aggregations.my_agg.buckets[j].doc_count > doc_count_max) {doc_count_max= data.aggregations.my_agg.buckets[j].doc_count };
+                        if ( data.aggregations.my_agg.buckets[j].doc_count < doc_count_min) {doc_count_min= data.aggregations.my_agg.buckets[j].doc_count };
+		}
+		doc_count_scale = doc_count_max - doc_count_min;
+		// modifie le geoJson pour ajouter les valeurs
+		var featuresLength=site_data_department.features.length;
+		for (var i=0; i<featuresLength; i++) {
+		    if (buckets[site_data_department.features[i].properties.CODE_DEPT]) {
+			site_data_department.features[i].properties.value = buckets[site_data_department.features[i].properties.CODE_DEPT];
+			site_data_department.features[i].properties.value_pct = (buckets[site_data_department.features[i].properties.CODE_DEPT] - doc_count_min) / doc_count_scale * 100;
+		    }
+		}
+		//add data to the map
+	  	site_data_departments.addData(site_data_department);
+		//map.addLayer(site_data_departmentLayer);
+
+	  })																																																																																											
+	 .fail(function( jqxhr, textStatus, error ) {
+	    var err = textStatus + ", " + error;
+	    console.log( "Request Failed: " + err );
+          })
+	  .always(function() {
+	    console.log( "complete_AGG" );
+	  });
+
+  })
+  .fail(function() {
+    console.log( "error" );
+  })
+  .always(function() {
+    console.log( "complete" );
+  });
 
 
 
-/* Empty layer placeholder to add to layer control for listening when to add/remove post box to markerClusters layer */
-var postboxLayer = L.geoJson(null);
-var postboxes = L.geoJson(null, {
-  pointToLayer: function (feature, latlng) {
-    return L.marker(latlng, {
-      icon: L.icon({
-        iconUrl: "assets/img/postbox.png",
-        iconSize: [24, 28],
-        iconAnchor: [12, 28],
-        popupAnchor: [0, -25]
-      }),
-      title: feature.properties.user,
-      riseOnHover: true
-    });
-  },
+
+//utilisé pour faire des heatmaps
+var geoJson2heat = function(geojson, valueField) {
+	return geojson.features.map(function(feature) {
+		return [
+			parseFloat(feature.geometry.coordinates[1]), 
+			parseFloat(feature.geometry.coordinates[0]), 
+			feature.properties[valueField]];
+	});
+}
+																																																																																																																			
+
+
+
+
+
+
+/* Empty layer placeholder to add to layer control for listening when to add/remove elasticsearch regate to markerClusters layer */
+var site_dataLayer = L.geoJson(null);
+var site_datas = L.geoJson(null, {
+    pointToLayer:  function (feature, latlng) {
+        return L.circleMarker(latlng, {
+					    radius: getCircleSize(feature.properties.value_pct, 'LIN10'),
+					    fillColor: getColor(feature.properties.value_pct, 'DIV12'),
+					    color: "#fff",
+					    weight: 1,
+					    opacity: 0.9,
+					    fillOpacity: 0.9
+					}
+				)
+																																																																																																																																								
+   },
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>ref</th><td>" + feature.properties.ref + "</td></tr>" + "<tr><th>Utilisateur openstreetmap</th><td>" + feature.properties.user + "</td></tr>" + "<tr><th>Relève</th><td>" + feature.properties.collection_times + "</td></tr>" + "<table>";
-      layer.on({
-        click: function (e) {
-          $("#feature-title").html(feature.properties.user);
+//http://www.source-organisation.courrier.intra.laposte.fr:8080/ebx/?redirect=/source-organisation/view/close.jsp&branch=BrancheSourceOrganisation&instance=InstanceSourceOrganisation&xpath=/root/D_ENTITE/T_ENTITE[./i_CODE=27303]																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																			
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Code Regate</th><td><a href='http://www.source-organisation.courrier.intra.laposte.fr:8080/ebx/?redirect=/source-organisation/view/close.jsp&branch=BrancheSourceOrganisation&instance=InstanceSourceOrganisation&xpath=/root/D_ENTITE/T_ENTITE[./i_CODE="+ feature.properties.id +"]' target='_blanck'>" + feature.properties.regate_code + "</a></td></tr>" + "<tr><th>Nom</th><td>" + feature.properties.entity_name + "</td></tr>" + "<tr><th>Valeur</th><td>" + feature.properties.value + "</td></tr>" + "<table><iframe src=\"http://localhost:5601/#/dashboard/New-Dashboard?embed&_g=(refreshInterval:(display:Off,section:0,value:0),time:(from:'2015-05-29T13:01:13.587Z',mode:absolute,to:'2015-05-29T14:03:40.226Z'))&_a=(filters:!(),panels:!((col:1,id:carto1,row:1,size_x:3,size_y:2,type:visualization),(col:4,id:facet,row:1,size_x:3,size_y:2,type:visualization),(col:7,id:New-Visualization,row:1,size_x:3,size_y:2,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'*')),title:'New%20Dashboard')\" height=\"600\" width=\"800\"></iframe>";
+    																																																																																							  
+ layer.on('mouseover mousemove', function(e){
+//ne marche pas !!!!!!
+    //highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+    //var hover_bubble = new L.Rrose({ offset: new L.Point(0,-1), closeButton: false, autoPan: false })
+    //  .setContent(feature.properties.regate_code + " " +feature.properties.entity_name)
+    //  .setLatLng(e.latlng)
+    //  .openOn(map);
+  });
+  //layer.on('mouseout', function(e){ map.closePopup() });
+
+
+layer.on({
+        
+	
+click: function (e) {
+          $("#feature-title").html(feature.properties.regate_code + " " +feature.properties.entity_name);
           $("#feature-info").html(content);
           $("#featureModal").modal("show");
           highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
         }
       });
-      $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/postbox.png"></td><td class="feature-name">' + layer.feature.properties.user + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
-      postboxSearch.push({
-        user: layer.feature.properties.user,
-        collection_times: layer.feature.properties.collection_times,
- 	ref: layer.feature.properties.ref,
-        source: "Postboxes",
+      $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/postbox.png"></td><td class="feature-name">' + layer.feature.properties.regate_code + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+
+	site_dataSearch.push({
+        name: layer.feature.properties.regate_code + " " +layer.feature.properties.entity_name,
+        source: "Site_datas",
         id: L.stamp(layer),
+        bounds: layer.getBounds(),
         lat: layer.feature.geometry.coordinates[1],
         lng: layer.feature.geometry.coordinates[0]
+
       });
     }
   }
 });
-// CORS error : $.getJSON("http://public.opendatasoft.com/explore/dataset/points-dinterets-openstreetmap-en-france/download/?format=geojson&refine.operator=La%20Poste&refine.amenity=post_box&timezone=Europe/Berlin", function (data) {
-$.getJSON("data/postboxes.geojson", function (data) {
-  postboxes.addData(data);
-  //map.addLayer(postboxLayer);
-});
+// CORS error + format : $.getJSON("http://public.opendatasoft.com/explore/dataset/points-dinterets-openstreetmap-en-france/download/?format=geojson&refine.operator=La%20Poste&refine.amenity=post_box&timezone=Europe/Berlin", function (data) {
+
+function decodeURL () {
+	
+	if (typeof(getURLParameter('url')) == "undefined" ||  getURLParameter('url') == "" ) {
+		return "http://localhost:9200/_search";
+	}	
+	else {
+		return decodeURIComponent(getURLParameter('url'));
+	}	
+}
+
+
+function requestData () {
+	// Récupere les données cartographiques
+	var data_regate = $.getJSON( "data/sites_regate.geojson", function() {
+	  
+	})
+	  .done(function(data_regate) {
+
+	    //console.log( "success elasticsearch" );
+
+	
+	var data_request = decodeURIComponent(getURLParameter('data_request')).replace(/[Nn]ow\+-/g,'now-').replace(/[Nn]ow\++/g,'now#').replace(/\+/g,' ').replace(/now\#/g,'now+');
+	if (data_request && data_request != "undefined") {
+		$('#data_request').val(data_request)
+	}
+	else {
+		data_request = $('#data_request').val();
+	}
+	if (data_request !== "") {
+	console.log(data_request);
+
+
+		//var request = $('#data_request').val();
+		//todo : add json validtr error
+		//var requestJson = JSON.parse(request);
+
+		var data = $.post( decodeURL(), data_request, function(data_regate) {
+		  console.log( "ELASTIC sucess_elastic" );
+		})
+		  
+		//récupere les données d'elasticsearch
+		//var data = $.getJSON( "data/sample_response_aggregation.geojson", function(data_regate) {
+		//var data = $.getJSON( "data/sample_CA_debut_2014.geojson", function(data_regate) {
+		//  console.log( "success_AGG" );
+		//})
+		  .done(function(data) {
+
+		    console.log( "ELASTIC second success_AGG" );
+																																
+			var buckets = [];
+			var doc_count_total =0;
+			var doc_count_max =0; // used to add color
+			var doc_count_min =0; // used to add color
+			var doc_count_scale =0; // used to add color
+			//for(bucket in data.aggregations.my_agg.buckets) {
+			// passe sous forme de tableau les données d'elasticsearch contenues dans le résultat aggregations
+			var bucketsLength=data.aggregations.my_agg.buckets.length;
+			for (var j=0; j<bucketsLength; j++) {
+				buckets[data.aggregations.my_agg.buckets[j].key]=data.aggregations.my_agg.buckets[j].doc_count;
+				doc_count_total = doc_count_total+data.aggregations.my_agg.buckets[j].doc_count;
+				if ( data.aggregations.my_agg.buckets[j].doc_count > doc_count_max) {doc_count_max= data.aggregations.my_agg.buckets[j].doc_count };
+		                if ( data.aggregations.my_agg.buckets[j].doc_count < doc_count_min) {doc_count_min= data.aggregations.my_agg.buckets[j].doc_count };
+			}
+			doc_count_scale = doc_count_max - doc_count_min;
+
+			// modifie le geoJson pour ajouter les valeurs
+			var featuresLength=data_regate.features.length;
+			for (var i=0; i<featuresLength; i++) {
+			    if (buckets[data_regate.features[i].properties.regate_code]) {
+				data_regate.features[i].properties.value = buckets[data_regate.features[i].properties.regate_code];
+				data_regate.features[i].properties.value_pct = (buckets[data_regate.features[i].properties.regate_code] - doc_count_min) / doc_count_scale * 100;
+			    }
+			}
+			
+
+
+		  	site_datas.addData(data_regate);
+			map.addLayer(site_dataLayer);
+
+			if (getURLParameter('heatmap_radius')  || getURLParameter('heatmap_blur')) {
+				//add heatmap data to the map
+				var heatmap_radius = 20;
+				if (getURLParameter('heatmap_radius') ) {
+					heatmap_radius = parseInt(getURLParameter('heatmap_radius'));
+				}
+				var heatmap_blur = 17;
+				if (getURLParameter('heatmap_blur') ) {
+					heatmap_blur = parseInt(getURLParameter('heatmap_blur'));
+				}
+				var geoData = geoJson2heat(data_regate, "value_pct"); 
+				var site_data_heatmapsLayer = L.heatLayer(geoData,{ radius: heatmap_radius,blur: heatmap_blur, maxZoom: 17})
+				map.addLayer(site_data_heatmapsLayer);
+			}
+
+		  })
+		 .fail(function( jqxhr, textStatus, error ) {
+		    var err = textStatus + ", " + error;
+		    console.log( "Request Failed: " + err );
+		  })
+		  .always(function() {
+		    //console.log( "complete_AGG" );
+		  });
+	}
+
+	  })
+	  .fail(function( jqxhr, textStatus, error ) {
+		    var err = textStatus + ", " + error;
+		    console.log( "Request Failed: " + err );
+		  })
+	  .always(function() {
+	    //console.log( "complete" );
+	  });
+
+}
+requestData();
 
 
 
-/* Empty layer placeholder to add to layer control for listening when to add/remove museums to markerClusters layer */
-var museumLayer = L.geoJson(null);
-var museums = L.geoJson(null, {
-  pointToLayer: function (feature, latlng) {
-    return L.marker(latlng, {
-      icon: L.icon({
-        iconUrl: "assets/img/museum.png",
-        iconSize: [24, 28],
-        iconAnchor: [12, 28],
-        popupAnchor: [0, -25]
-      }),
-      title: feature.properties.NAME,
-      riseOnHover: true
-    });
-  },
-  onEachFeature: function (feature, layer) {
-    if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.NAME + "</td></tr>" + "<tr><th>Phone</th><td>" + feature.properties.TEL + "</td></tr>" + "<tr><th>Address</th><td>" + feature.properties.ADRESS1 + "</td></tr>" + "<tr><th>Website</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
-      layer.on({
-        click: function (e) {
-          $("#feature-title").html(feature.properties.NAME);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
-          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
-        }
-      });
-      $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/museum.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
-      museumSearch.push({
-        name: layer.feature.properties.NAME,
-        address: layer.feature.properties.ADRESS1,
-        source: "Museums",
-        id: L.stamp(layer),
-        lat: layer.feature.geometry.coordinates[1],
-        lng: layer.feature.geometry.coordinates[0]
-      });
-    }
-  }
-});
-$.getJSON("data/DOITT_MUSEUM_01_13SEPT2010.geojson", function (data) {
-  museums.addData(data);
-});
+
+
+
+
+
+
+
+
 
 map = L.map("map", {
   zoom: 6,
   center: [46.9996919,3.1241694],
-  layers: [mapquestOSM, departments, markerClusters, highlight],
+  layers: [mapquestOSM, site_datas, markerClusters, highlight],
   zoomControl: true,
   attributionControl: false
 });
 
 /* Layer control listeners that allow for a single markerClusters layer */
 map.on("overlayadd", function(e) {
-  if (e.layer === theaterLayer) {
-    markerClusters.addLayer(theaters);
+ 
+  
+  if (e.layer === site_dataLayer) {
+    //markerClusters.addLayer(site_datas);
     syncSidebar();
   }
-  if (e.layer === postboxLayer) {
-    markerClusters.addLayer(postboxes);
-    syncSidebar();
+  if (e.layer === site_data_departmentLayer) {
+    markerClusters.addLayer(site_data_departments);
+    //syncSidebar();
   }
-  if (e.layer === museumLayer) {
-    markerClusters.addLayer(museums);
-    syncSidebar();
-  }
+  
 });
 
 map.on("overlayremove", function(e) {
-  if (e.layer === theaterLayer) {
-    markerClusters.removeLayer(theaters);
+  
+  if (e.layer === site_dataLayer) {
+    //markerClusters.removeLayer(site_datas);
     syncSidebar();
   }
-  if (e.layer === postboxLayer) {
-    markerClusters.removeLayer(postboxes);
-    syncSidebar();
+  if (e.layer === site_data_departmentLayer) {
+    markerClusters.removeLayer(site_data_departments);
+    //syncSidebar();
   }
-  if (e.layer === museumLayer) {
-    markerClusters.removeLayer(museums);
-    syncSidebar();
-  }
+ 
+  
 });
 
 /* Filter sidebar feature list to only show features in current map bounds */
@@ -505,7 +857,7 @@ var attributionControl = L.control({
 });
 attributionControl.onAdd = function (map) {
   var div = L.DomUtil.create("div", "leaflet-control-attribution");
-  div.innerHTML = "<span class='hidden-xs'>Developed by <a href='http://bryanmcbride.com'>bryanmcbride.com</a> | </span><a href='#' onclick='$(\"#attributionModal\").modal(\"show\"); return false;'>Attribution</a>";
+  div.innerHTML = "<span class='hidden-xs'>Developed by claude.seguret@laposte.fr | </span><a href='#' onclick='$(\"#attributionModal\").modal(\"show\"); return false;'>Attribution</a>";
   return div;
 };
 map.addControl(attributionControl);
@@ -556,19 +908,26 @@ if (document.body.clientWidth <= 767) {
 var baseLayers = {
   "Plan": mapquestOSM,
   "Carte satellite": mapquestOAM,
+  "Carte avec rues": mapquestHYB,
+  //"% de bas revenus": LMaplowIncomes,
+  "% de moins de 25 ans": LMapless25YearsOld,
+  "% de 65 ans et plus": LMapplus65YearsOld,
+  "Densité de population": LMappopulation,
+  "Revenus": LMapIncomes,
   "Carte avec rues": mapquestHYB
+
 };
 
 var groupedOverlays = {
   "Points d'interêts": {
-    "<img src='assets/img/theater.png' width='24' height='28'>&nbsp;Theaters": theaterLayer,
-    "<img src='assets/img/postbox.png' width='24' height='28'>&nbsp;Boites jaunes": postboxLayer,
-    "<img src='assets/img/museum.png' width='24' height='28'>&nbsp;Museums": museumLayer
+    //"<img src='assets/img/postbox.png' width='24' height='28'>&nbsp;Boites jaunes": postboxLayer ,
+     "<img src='assets/img/factory.png' width='24' height='28'>&nbsp;Sites": site_dataLayer
   },
-  "Réference": {
-    "Arrondissements": boroughs,
-    "Départements": departments,
-    "Transports en communs": subwayLines
+  "Analyses": {
+  
+    "Analyse par site": site_datas,
+    //"Prestations par Site": site_datas,
+    "CA par departement": site_data_departments
   }
 };
 
@@ -611,45 +970,22 @@ $(document).one("ajaxStop", function () {
     limit: 10
   });
 
- var departmentsBH = new Bloodhound({
-    name: "Départements",
+   var sitesBH = new Bloodhound({
+    name: "Sites",
     datumTokenizer: function (d) {
       return Bloodhound.tokenizers.whitespace(d.name);
     },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    local: departmentSearch,
-    limit: 10
+    local: site_dataSearch,
+    limit: 5
   });
 
-  var theatersBH = new Bloodhound({
-    name: "Théatres",
-    datumTokenizer: function (d) {
-      return Bloodhound.tokenizers.whitespace(d.name);
-    },
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    local: theaterSearch,
-    limit: 10
-  });
 
-  var postboxesBH = new Bloodhound({
-    name: "BoitesJaunes",
-    datumTokenizer: function (d) {
-      return Bloodhound.tokenizers.whitespace(d.name);
-    },
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    local: postboxSearch,
-    limit: 10
-  });
+ 
 
-  var museumsBH = new Bloodhound({
-    name: "Musées",
-    datumTokenizer: function (d) {
-      return Bloodhound.tokenizers.whitespace(d.name);
-    },
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    local: museumSearch,
-    limit: 10
-  });
+  
+
+  
 
   var geonamesBH = new Bloodhound({
     name: "GeoNames",
@@ -679,18 +1015,18 @@ $(document).one("ajaxStop", function () {
         }
       }
     },
-    limit: 10
+    limit: 5
   });
   boroughsBH.initialize();
-  departmentsBH.initialize();
-  theatersBH.initialize();
-  postboxesBH.initialize();
-  museumsBH.initialize();
+  sitesBH.initialize();
+
+
+
   geonamesBH.initialize();
 
   /* instantiate the typeahead UI */
   $("#searchbox").typeahead({
-    minLength: 3,
+    minLength: 2,
     highlight: true,
     hint: false
   }, {
@@ -698,39 +1034,16 @@ $(document).one("ajaxStop", function () {
     displayKey: "name",
     source: boroughsBH.ttAdapter(),
     templates: {
-      header: "<h4 class='typeahead-header'>Boroughs</h4>"
+      header: "<h4 class='typeahead-header'>Arrondissments</h4>"
     }
   }, {
-    name: "Departments",
+    name: "Sites",
     displayKey: "name",
-    source: boroughsBH.ttAdapter(),
+    source: sitesBH.ttAdapter(),
     templates: {
-      header: "<h4 class='typeahead-header'>Départements</h4>"
+      header: "<h4 class='typeahead-header'><img src='assets/img/factory.png' width='24' height='28'>&nbsp;Sites</h4>"
     }
-  }, {
-    name: "Theaters",
-    displayKey: "name",
-    source: theatersBH.ttAdapter(),
-    templates: {
-      header: "<h4 class='typeahead-header'><img src='assets/img/theater.png' width='24' height='28'>&nbsp;Theaters</h4>",
-      suggestion: Handlebars.compile(["{{name}}<br>&nbsp;<small>{{address}}</small>"].join(""))
-    }
-  }, {
-    name: "Postboxes",
-    displayKey: "name",
-    source: postboxesBH.ttAdapter(),
-    templates: {
-      header: "<h4 class='typeahead-header'><img src='assets/img/postbox.png' width='24' height='28'>&nbsp;Boites Jaunes</h4>",
-      suggestion: Handlebars.compile(["{{name}}<br>&nbsp;<small>{{user}}</small>"].join(""))
-    }
-  }, {
-    name: "Museums",
-    displayKey: "name",
-    source: museumsBH.ttAdapter(),
-    templates: {
-      header: "<h4 class='typeahead-header'><img src='assets/img/museum.png' width='24' height='28'>&nbsp;Museums</h4>",
-      suggestion: Handlebars.compile(["{{name}}<br>&nbsp;<small>{{address}}</small>"].join(""))
-    }
+  
   }, {
     name: "GeoNames",
     displayKey: "name",
@@ -742,36 +1055,13 @@ $(document).one("ajaxStop", function () {
     if (datum.source === "Boroughs") {
       map.fitBounds(datum.bounds);
     }
+    if (datum.source === "Site_datas") {
+      map.fitBounds(datum.bounds);
+    }
     if (datum.source === "Arrondissements") {
       map.fitBounds(datum.bounds);
     }
-    if (datum.source === "Theaters") {
-      if (!map.hasLayer(theaterLayer)) {
-        map.addLayer(theaterLayer);
-      }
-      map.setView([datum.lat, datum.lng], 17);
-      if (map._layers[datum.id]) {
-        map._layers[datum.id].fire("click");
-      }
-    }
-   if (datum.source === "Postboxes") {
-      if (!map.hasLayer(postboxLayer)) {
-        map.addLayer(postboxLayer);
-      }
-      map.setView([datum.lat, datum.lng], 17);
-      if (map._layers[datum.id]) {
-        map._layers[datum.id].fire("click");
-      }
-    }
-    if (datum.source === "Museums") {
-      if (!map.hasLayer(museumLayer)) {
-        map.addLayer(museumLayer);
-      }
-      map.setView([datum.lat, datum.lng], 17);
-      if (map._layers[datum.id]) {
-        map._layers[datum.id].fire("click");
-      }
-    }
+   
     if (datum.source === "GeoNames") {
       map.setView([datum.lat, datum.lng], 14);
     }
