@@ -458,11 +458,11 @@ function getCircleSize(d, style_map_size) {
 		   d > 40  ? 12 :
 		   d > 20  ? 10 :
 		   d > 5   ? 8 :
-		              3;
+		              2;
 	}
 	if (style_map_size == "POINT") {
 	    d=Math.round(d);
-	    return           3;
+	    return           2;
 	}
        if (style_map_size == "LIN10") {
 	    d=Math.round(d);
@@ -476,7 +476,7 @@ function getCircleSize(d, style_map_size) {
 		   d > 25   ? 10 :
 		   d > 15   ? 9 :
 		   d > 5   ? 8 :
-		              3;
+		              2;
 	}
 }
 
@@ -673,7 +673,7 @@ function decodeURL () {
 		return "http://localhost:9200/_search";
 	}	
 	else {
-		return decodeURIComponent(getURLParameter('url'));
+		return decodeURIComponent(getURLParameter('url')).toString();
 	}	
 }
 
@@ -703,7 +703,7 @@ function requestData () {
 		//todo : add json validtr error
 		//var requestJson = JSON.parse(request);
 
-		var data = $.post( decodeURL(), data_request, function(data_regate) {
+		var data = $.post( {"url": decodeURL(), "crossDomain":true, "beforeSend": function (xhr) {xhr.setRequestHeader ("Authorization", "Basic XXXXXX");}, "data": data_request}, function(data_regate) {
 		  console.log( "ELASTIC sucess_elastic" );
 		})
 		  
@@ -724,7 +724,8 @@ function requestData () {
 			//for(bucket in data.aggregations.my_agg.buckets) {
 			// passe sous forme de tableau les données d'elasticsearch contenues dans le résultat aggregations
 			var bucketsLength=data.aggregations.my_agg.buckets.length;
-			for (var j=0; j<bucketsLength; j++) {
+			//hack
+			for (var j=1; j<bucketsLength; j++) {
 				buckets[data.aggregations.my_agg.buckets[j].key]=data.aggregations.my_agg.buckets[j].doc_count;
 				doc_count_total = doc_count_total+data.aggregations.my_agg.buckets[j].doc_count;
 				if ( data.aggregations.my_agg.buckets[j].doc_count > doc_count_max) {doc_count_max= data.aggregations.my_agg.buckets[j].doc_count };
