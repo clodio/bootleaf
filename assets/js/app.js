@@ -759,7 +759,7 @@ var data = $.post(  decodeURL(), data_request, function(data_regate) {
 				if (getURLParameter('heatmap_blur') ) {
 					heatmap_blur = parseInt(getURLParameter('heatmap_blur'));
 				}
-				var geoData = geoJson2heat(data_regate, "value_pct"); 
+				var geoData = geoJson2heat(data_regate, "value"); 
 				var site_data_heatmapsLayer = L.heatLayer(geoData,{ radius: heatmap_radius,blur: heatmap_blur, maxZoom: 17})
 				map.addLayer(site_data_heatmapsLayer);
 			}
