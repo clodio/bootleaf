@@ -597,12 +597,11 @@ var site_data_department= $.getJSON( "data/departement.geojson", function() {
 //utilisé pour faire des heatmaps
 var geoJson2heat = function(geojson, valueField) {
 	return geojson.features.map(function(feature) {
-		if (feature.properties[valueField] >0) {
 		return [
 			parseFloat(feature.geometry.coordinates[1]), 
 			parseFloat(feature.geometry.coordinates[0]), 
 			feature.properties[valueField]];
-		}
+		
 	});
 }
 																																																																																																																			
