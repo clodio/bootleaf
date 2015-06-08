@@ -703,8 +703,10 @@ function requestData () {
 		//todo : add json validtr error
 		//var requestJson = JSON.parse(request);
 
-		var data = $.post( {"url": decodeURL(), "crossDomain":true, "beforeSend": function (xhr) {xhr.setRequestHeader ("Authorization", "Basic XXXXXX");}, "data": data_request}, function(data_regate) {
-		  console.log( "ELASTIC sucess_elastic" );
+//		var data = $.post( {"url": decodeURL(), "crossDomain":true, "beforeSend": function (xhr) {xhr.setRequestHeader ("Authorization", "Basic XXXXXX");}, "data": data_request}, function(data_regate) {
+var data = $.post(  decodeURL(), data_request, function(data_regate) {
+				
+  console.log( "ELASTIC sucess_elastic" );
 		})
 		  
 		//récupere les données d'elasticsearch
