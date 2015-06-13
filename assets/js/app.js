@@ -1,6 +1,327 @@
 var map, featureList, boroughSearch = [],  siteSearch = [],site_dataSearch = [];
 
+//http://localhost:8080/bootleaf/?style_map_color=&style_map_size=&heatmap_blur=&heatmap_radius=&url=&data_request=%7B%0D%0A++%22query%22%3A+%7B%0D%0A++++%22filtered%22%3A+%7B%0D%0A++++++%22query%22%3A+%7B%0D%0A++++++++%22query_string%22%3A+%7B%0D%0A++++++++++%22analyze_wildcard%22%3A+true%2C%0D%0A++++++++++%22query%22%3A+%22*%22%0D%0A++++++++%7D%0D%0A++++++%7D%2C%0D%0A++++++%22filter%22%3A+%7B%0D%0A++++++++%22bool%22%3A+%7B%0D%0A++++++++++%22must%22%3A+%5B%0D%0A++++++++++++%7B%0D%0A++++++++++++++%22range%22%3A+%7B%0D%0A++++++++++++++++%22%40timestamp%22%3A+%7B%0D%0A++++++++++++++++++%22gte%22%3A+1420066800000%2C%0D%0A++++++++++++++++++%22lte%22%3A+1451602799999%0D%0A++++++++++++++++%7D%0D%0A++++++++++++++%7D%0D%0A++++++++++++%7D%0D%0A++++++++++%5D%2C%0D%0A++++++++++%22must_not%22%3A+%5B%5D%0D%0A++++++++%7D%0D%0A++++++%7D%0D%0A++++%7D%0D%0A++%7D%2C%0D%0A++%22size%22%3A+0%2C%0D%0A++%22aggs%22%3A+%7B%0D%0A++++%22my_agg%22%3A+%7B%0D%0A++++++%22terms%22%3A+%7B%0D%0A++++++++%22field%22%3A+%22regate.raw%22%2C%0D%0A++++++++%22size%22%3A+0%0D%0A++++++%7D%2C%0D%0A++++++%22aggs%22%3A+%7B%0D%0A++++++++%22sub_agg%22%3A+%7B%0D%0A++++++++++%22cardinality%22%3A+%7B%0D%0A++++++++++++%22field%22%3A+%22response.raw%22%0D%0A++++++++++%7D%0D%0A++++++++%7D%2C%0D%0A++++++++%22sub_sub_agg%22%3A+%7B%0D%0A++++++++++%22terms%22%3A+%7B%0D%0A++++++++++++%22field%22%3A+%22verb.raw%22%2C%0D%0A++++++++++++%22size%22%3A+0%0D%0A++++++++++%7D%2C%0D%0A++++++++++%22aggs%22%3A+%7B%0D%0A++++++++++++%22sub_agg%22%3A+%7B%0D%0A++++++++++++++%22cardinality%22%3A+%7B%0D%0A++++++++++++++++%22field%22%3A+%22response.raw%22%0D%0A++++++++++++++%7D%0D%0A++++++++++++%7D%0D%0A++++++++++%7D%0D%0A++++++++%7D%0D%0A++++++%7D%0D%0A++++%7D%0D%0A++%7D%0D%0A%7D
 
+
+
+//d3pie
+function defineFeature(feature, latlng) {
+   //todo change in d3pie
+
+	if (!feature.properties.data) {
+	  	//si pas de données, affiche un point et pas un pie
+		return L.circleMarker(latlng, {
+					    radius: 3,
+					    fillColor: "#111",
+					    color: "#fff",
+					    weight: 1,
+					    opacity: 0.9,
+					    fillOpacity: 0.9
+					}
+		);
+	}
+	var key_value_cluster =[];
+	var sumCluster =0;
+	//addaptation du format de données pour d3
+	for (var key in feature.properties.data) {
+	    if (key === 'length' || !feature.properties.data.hasOwnProperty(key)) continue;
+	    	var value = feature.properties.data[key];
+		if (!key_value_cluster[key]) {
+			key_value_cluster[key]=[];
+		}
+		key_value_cluster[key].push(value);
+		sumCluster= sumCluster +value;
+	}
+
+	// adapt format to match d3 data
+	var key_value_final = [];	
+	for (var key in key_value_cluster) {
+	    if (key === 'length' || !key_value_cluster.hasOwnProperty(key)) continue;
+	    	var value = key_value_cluster[key];
+		key_value_final.push({"key":key,"values":key_value_cluster[key]} );
+	}
+
+
+    var  n = sumCluster,//  sum of values
+        strokeWidth = 1, //Set clusterpie stroke width
+        r = rmax-2*strokeWidth-(n<10?12:n<100?8:n<1000?4:0), //Calculate clusterpie radius...
+
+        iconDim = (r+strokeWidth)*2, //...and divIcon dimensions (leaflet really want to know the size)
+        
+        //bake some svg markup
+        html = bakeThePie({data: key_value_final, 
+                valueFunc: function(d){
+					var count = 0;
+					var nbItem = d.values.length;
+					for(var i = 0; i < nbItem; i++)	{
+						count = count + d.values[i];
+					}
+					return count;
+			    },
+                strokeWidth: 1,
+                outerRadius: r,
+                innerRadius: r-10,
+                pieClass: 'cluster-pie',
+                pieLabel: n,
+                pieLabelClass: 'marker-cluster-pie-label',
+                pathClassFunc: function(d){
+					// donne le style du sous bloc de pie				
+					return "category-"+metadata.data[d.data.key];
+			    },
+                pathTitleFunc: function(d){
+					//affiche le texte sur survol d'un pie
+					var sumValues = 0;
+					var countValues = d.data.values.length;
+					for(var i = 0; i < countValues; i++) {
+						sumValues = sumValues + d.data.values[i];
+					}
+					return d.data.key +' ('+sumValues+')';
+			    }
+        }),
+        //Create a new divIcon and assign the svg markup to the html property
+        myIcon = new L.DivIcon({
+            html: html,
+            className: 'marker-cluster', 
+            iconSize: new L.Point(iconDim, iconDim)
+        });
+     return L.marker(latlng, {icon: myIcon});
+
+}
+
+function defineFeaturePopup(feature, layer) {
+
+	var props = feature.properties,
+    fields = metadata.data;
+    
+	var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Code Regate</th><td><a href='http://www.source-organisation.courrier.intra.laposte.fr:8080/ebx/?redirect=/source-organisation/view/close.jsp&branch=BrancheSourceOrganisation&instance=InstanceSourceOrganisation&xpath=/root/D_ENTITE/T_ENTITE[./i_CODE="+ feature.properties.id +"]' target='_blanck'>" + feature.properties.regate_code + "</a></td></tr>" + "<tr><th>Nom</th><td>" + feature.properties.entity_name + "</td></tr>";
+	for( var key in feature.properties.data) {
+		if (key === 'length' || !feature.properties.data.hasOwnProperty(key)) continue;		
+		content = content +"<tr><th>"+key+"</th><td>" + feature.properties.data[key] + "</td></tr>";
+	}
+
+	content = content +"<table><iframe src=\"http://localhost:5601/#/dashboard/New-Dashboard?embed&_g=(refreshInterval:(display:Off,section:0,value:0),time:(from:'2015-05-29T13:01:13.587Z',mode:absolute,to:'2015-05-29T14:03:40.226Z'))&_a=(filters:!(),panels:!((col:1,id:carto1,row:1,size_x:3,size_y:2,type:visualization),(col:4,id:facet,row:1,size_x:3,size_y:2,type:visualization),(col:7,id:New-Visualization,row:1,size_x:3,size_y:2,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'*')),title:'New%20Dashboard')\" height=\"600\" width=\"800\"></iframe>";
+
+	layer.on({
+        click: function (e) {
+          $("#feature-title").html(feature.properties.regate_code + " " +feature.properties.entity_name);
+          $("#feature-info").html(content);
+          $("#featureModal").modal("show");
+          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+
+        }
+      });
+
+}
+
+function defineClusterIcon(cluster) {
+//var key_value = [
+//   {
+//      "key": "1",
+//      "values": [
+//         {
+//            "value": 5
+//         },
+//         {
+ ////           "value": 6
+//         }
+//      ]
+//   },
+//   {
+//      "key": "2",
+//      "values": [
+//         {
+//            "value": 5
+////         }
+ //     ]
+////   }
+//]
+
+
+    var children = cluster.getAllChildMarkers();
+	
+	// calculate d3 data with key values of the childrens
+	var key_value_cluster = {};
+	var sumCluster = 0;
+	var nbChildren = children.length;
+	for(var i = 0; i < nbChildren; i++) {
+		for (var key in children[i].feature.properties.data) {
+		    if (key === 'length' || !children[i].feature.properties.data.hasOwnProperty(key)) continue;
+		    	var value = children[i].feature.properties.data[key];
+			if (!key_value_cluster[key]) {
+				key_value_cluster[key]=[];
+			}
+			key_value_cluster[key].push(value);
+			sumCluster= sumCluster +value;
+		}
+	}
+	// adapt format to match d3 data
+	var key_value_final = [];	
+	for (var key in key_value_cluster) {
+	    if (key === 'length' || !key_value_cluster.hasOwnProperty(key)) continue;
+	    	var value = key_value_cluster[key];
+		key_value_final.push({"key":key,"values":key_value_cluster[key]} );
+	}
+	
+    //sumCluster sommme des valeurs
+    var  n = sumCluster,//  sum of childrens value.   //old children.length, 
+        strokeWidth = 1, //Set clusterpie stroke width
+        r = rmax-2*strokeWidth-(n<10?12:n<100?8:n<1000?4:0), //Calculate clusterpie radius...
+
+        iconDim = (r+strokeWidth)*2, //...and divIcon dimensions (leaflet really want to know the size)
+        
+        //bake some svg markup
+        html = bakeThePie({data: key_value_final,
+                valueFunc: function(d){
+							var count = 0;
+							var nbItem = d.values.length;
+							for(var i = 0; i < nbItem; i++)
+							{
+								count = count + d.values[i];
+							}
+
+							return count;
+			    },
+                strokeWidth: 1,
+                outerRadius: r,
+                innerRadius: r-10,
+                pieClass: 'cluster-pie',
+                pieLabel: n,
+                pieLabelClass: 'marker-cluster-pie-label',
+                pathClassFunc: function(d) {
+					// donne le style du sous bloc de pie				
+					return "category-"+metadata.data[d.data.key];
+				},
+                pathTitleFunc: function(d){
+					//affiche le texte sur survol d'un pie
+					var sumValues = 0;
+					var countValues = d.data.values.length;
+					for(var i = 0; i < countValues; i++) {
+						sumValues = sumValues + d.data.values[i];
+					}
+					return d.data.key +' ('+sumValues+')';
+			    }
+				//return metadata.fields[categoryField].lookup[d.data.key]+' ('+d.data.values.length+' accident'+(d.data.values.length!=1?'s':'')+')';}
+        }),
+        //Create a new divIcon and assign the svg markup to the html property
+        myIcon = new L.DivIcon({
+            html: html,
+            className: 'marker-cluster', 
+            iconSize: new L.Point(iconDim, iconDim)
+        });
+    return myIcon;
+}
+
+
+
+
+
+
+/*function that generates a svg markup for the pie chart*/
+function bakeThePie(options) {
+    /*data and valueFunc are required*/
+    if (!options.data || !options.valueFunc) {
+        return '';
+    }
+    var data = options.data,
+        valueFunc = options.valueFunc,
+        r = options.outerRadius?options.outerRadius:28, //Default outer radius = 28px
+        rInner = options.innerRadius?options.innerRadius:r-10, //Default inner radius = r-10
+        strokeWidth = options.strokeWidth?options.strokeWidth:1, //Default stroke is 1
+        pathClassFunc = options.pathClassFunc?options.pathClassFunc:function(){return '';}, //Class for each path
+        pathTitleFunc = options.pathTitleFunc?options.pathTitleFunc:function(){return '';}, //Title for each path
+        pieClass = options.pieClass?options.pieClass:'marker-cluster-pie', //Class for the whole pie
+        pieLabel = options.pieLabel?options.pieLabel:d3.sum(data,valueFunc), //Label for the whole pie
+        pieLabelClass = options.pieLabelClass?options.pieLabelClass:'marker-cluster-pie-label',//Class for the pie label
+        
+        origo = (r+strokeWidth), //Center coordinate
+        w = origo*2, //width and height of the svg element
+        h = w,
+        donut = d3.layout.pie(),
+        arc = d3.svg.arc().innerRadius(rInner).outerRadius(r);
+        
+    //Create an svg element
+    var svg = document.createElementNS(d3.ns.prefix.svg, 'svg');
+    //Create the pie chart
+    var vis = d3.select(svg)
+        .data([data])
+        .attr('class', pieClass)
+        .attr('width', w)
+        .attr('height', h);
+        
+    var arcs = vis.selectAll('g.arc')
+        .data(donut.value(valueFunc))
+        .enter().append('svg:g')
+        .attr('class', 'arc')
+        .attr('transform', 'translate(' + origo + ',' + origo + ')');
+    
+    arcs.append('svg:path')
+        .attr('class', pathClassFunc)
+        .attr('stroke-width', strokeWidth)
+        .attr('d', arc)
+        .append('svg:title')
+          .text(pathTitleFunc);
+                
+    vis.append('text')
+        .attr('x',origo)
+        .attr('y',origo)
+        .attr('class', pieLabelClass)
+        .attr('text-anchor', 'middle')
+        //.attr('dominant-baseline', 'central')
+        /*IE doesn't seem to support dominant-baseline, but setting dy to .3em does the trick*/
+        .attr('dy','.3em')
+        .text(pieLabel);
+    //Return the svg-markup rather than the actual element
+    return serializeXmlNode(svg);
+}
+
+
+/*Function for generating a legend with the same categories as in the clusterPie*/
+function renderTitle(title) {
+    //var data = d3.entries(metadata.data);
+	if (title !== "") {
+	 var titlediv = d3.select('#map').append('div').attr('id','title');
+	 var heading = titlediv.append('div')
+        .classed('title', true)
+        .text(title);
+	}
+}
+
+
+
+/*Helper function*/
+function serializeXmlNode(xmlNode) {
+    if (typeof window.XMLSerializer != "undefined") {
+        return (new window.XMLSerializer()).serializeToString(xmlNode);
+    } else if (typeof xmlNode.xml != "undefined") {
+        return xmlNode.xml;
+    }
+    return "";
+}
+
+//utilisé pour faire des heatmaps
+var geoJson2heat = function(geojson, valueField) {
+	return geojson.features.map(function(feature) {
+		
+		return [
+			parseFloat(feature.geometry.coordinates[1]), 
+			parseFloat(feature.geometry.coordinates[0]), 
+			feature.properties[valueField]];
+	});
+}
+
+ var geojson,
+    metadata,
+    rmax = 30, //Maximum radius for cluster pies
+    markerClusters = L.markerClusterGroup({
+      maxClusterRadius: 2*rmax,
+      iconCreateFunction: defineClusterIcon, //this is where the magic happens
+      showCoverageOnHover: false,
+	//  spiderfyOnMaxZoom: true,
+	//  zoomToBoundsOnClick: true,
+	//  disableClusteringAtZoom: 16,
+	//  maxClusterRadius: 80,
+    });
+ 
 
 
 $(window).resize(function() {
@@ -89,18 +410,23 @@ function getURLParameter(sParam) {
 $( document ).ready(function() {
   // Handler for .ready() called.
 
-$('#style_map_color').val(getURLParameter('style_map_color'));
-$('#style_map_size').val(getURLParameter('style_map_size'));
-$('#heatmap_blur').val(getURLParameter('heatmap_blur'));
-$('#heatmap_radius').val(getURLParameter('heatmap_radius'));
-if (typeof(getURLParameter('url')) != "undefined" &&  getURLParameter('url') != "" ) {
-	$('#url').val(decodeURIComponent(getURLParameter('url')));
-}
+	// Récupération des paramètres d'url
+	$('#style_map_color').val(getURLParameter('style_map_color'));
+	$('#style_map_size').val(getURLParameter('style_map_size'));
+	$('#heatmap_blur').val(getURLParameter('heatmap_blur'));
+	$('#heatmap_radius').val(getURLParameter('heatmap_radius'));
+	$('#heatmap_radius').val(getURLParameter('heatmap_radius'));
+	if (typeof(getURLParameter('url')) != "undefined" &&  getURLParameter('url') != "" ) {
+		$('#url').val(decodeURIComponent(getURLParameter('url')));
+	}
+	if (typeof(getURLParameter('title')) != "undefined" &&  getURLParameter('title') != "" ) {
+		$('#title').val(decodeURIComponent(getURLParameter('title')));
+		renderTitle($('#title').val());
+	}
 });
 
 function sidebarClick(id, lat, lng) {
 
-  
   if (lat) {
      map.setView([lat, lng], 17);
   }
@@ -118,26 +444,26 @@ function sidebarClick(id, lat, lng) {
 }
 
 function syncSidebar() {
-  /* Empty sidebar features */
-  $("#feature-list tbody").empty();
+  	/* Empty sidebar features */
+  	$("#feature-list tbody").empty();
   
-/* Loop through site_data layer and add only features which are in the map bounds */
-  site_datas.eachLayer(function (layer) {
-    if (map.hasLayer(site_dataLayer)) {
-      if (map.getBounds().contains(layer.getLatLng())) {
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/factory.png"></td><td class="feature-name">' + layer.feature.properties.regate_code + ' ' + layer.feature.properties.entity_name + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
-      }
-    }
-  });
+	/* Loop through site_data layer and add only features which are in the map bounds */
+  	site_datas.eachLayer(function (layer) {
+		if (map.hasLayer(site_dataLayer)) {
+		  if (map.getBounds().contains(layer.getLatLng())) {
+		    $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/factory.png"></td><td class="feature-name">' + layer.feature.properties.regate_code + ' ' + layer.feature.properties.entity_name + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+		  }
+		}
+	  });
   
 
-  /* Update list.js featureList */
-  featureList = new List("features", {
-    valueNames: ["feature-name"]
-  });
-  featureList.sort("feature-name", {
-    order: "asc"
-  });
+	  /* Update list.js featureList */
+	  featureList = new List("features", {
+		valueNames: ["feature-name"]
+	  });
+	  featureList.sort("feature-name", {
+		order: "asc"
+	  });
 }
 
 /* Basemap Layers */
@@ -204,27 +530,7 @@ var highlightStyle = {
   radius: 10
 };
 
-var boroughs = L.geoJson(null, {
-  style: function (feature) {
-    return {
-      color: "black",
-      fill: false,
-      opacity: 1,
-      clickable: false
-    };
-  },
-  onEachFeature: function (feature, layer) {
-    boroughSearch.push({
-      name: layer.feature.properties.BoroName,
-      source: "Arrondissements",
-      id: L.stamp(layer),
-      bounds: layer.getBounds()
-    });
-  }
-});
-$.getJSON("data/boroughs.geojson", function (data) {
-  boroughs.addData(data);
-});
+
 
 var departments = L.geoJson(null, {
   style: function (feature) {
@@ -245,129 +551,8 @@ $.getJSON("data/departement.geojson", function (data) {
 
 
 
-var subwayLines = L.geoJson(null, {
-  style: function (feature) {
-    if (feature.properties.route_id === "1" || feature.properties.route_id === "2" || feature.properties.route_id === "3") {
-      return {
-        color: "#ff3135",
-        weight: 3,
-        opacity: 1
-      };
-    }
-    if (feature.properties.route_id === "4" || feature.properties.route_id === "5" || feature.properties.route_id === "6") {
-      return {
-        color: "#009b2e",
-        weight: 3,
-        opacity: 1
-      };
-    }
-    if (feature.properties.route_id === "7") {
-      return {
-        color: "#ce06cb",
-        weight: 3,
-        opacity: 1
-      };
-    }
-    if (feature.properties.route_id === "A" || feature.properties.route_id === "C" || feature.properties.route_id === "E" || feature.properties.route_id === "SI" || feature.properties.route_id === "H") {
-      return {
-        color: "#fd9a00",
-        weight: 3,
-        opacity: 1
-      };
-    }
-    if (feature.properties.route_id === "Air") {
-      return {
-        color: "#ffff00",
-        weight: 3,
-        opacity: 1
-      };
-    }
-    if (feature.properties.route_id === "B" || feature.properties.route_id === "D" || feature.properties.route_id === "F" || feature.properties.route_id === "M") {
-      return {
-        color: "#ffff00",
-        weight: 3,
-        opacity: 1
-      };
-    }
-    if (feature.properties.route_id === "G") {
-      return {
-        color: "#9ace00",
-        weight: 3,
-        opacity: 1
-      };
-    }
-    if (feature.properties.route_id === "FS" || feature.properties.route_id === "GS") {
-      return {
-        color: "#6e6e6e",
-        weight: 3,
-        opacity: 1
-      };
-    }
-    if (feature.properties.route_id === "J" || feature.properties.route_id === "Z") {
-      return {
-        color: "#976900",
-        weight: 3,
-        opacity: 1
-      };
-    }
-    if (feature.properties.route_id === "L") {
-      return {
-        color: "#969696",
-        weight: 3,
-        opacity: 1
-      };
-    }
-    if (feature.properties.route_id === "N" || feature.properties.route_id === "Q" || feature.properties.route_id === "R") {
-      return {
-        color: "#ffff00",
-        weight: 3,
-        opacity: 1
-      };
-    }
-  },
-  onEachFeature: function (feature, layer) {
-    if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Division</th><td>" + feature.properties.Division + "</td></tr>" + "<tr><th>Ligne</th><td>" + feature.properties.Line + "</td></tr>" + "<table>";
-      layer.on({
-        click: function (e) {
-          $("#feature-title").html(feature.properties.Line);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
 
-        }
-      });
-    }
-    layer.on({
-      mouseover: function (e) {
-        var layer = e.target;
-        layer.setStyle({
-          weight: 3,
-          color: "#00FFFF",
-          opacity: 1
-        });
-        if (!L.Browser.ie && !L.Browser.opera) {
-          layer.bringToFront();
-        }
-      },
-      mouseout: function (e) {
-        subwayLines.resetStyle(e.target);
-      }
-    });
-  }
-});
-$.getJSON("data/subways.geojson", function (data) {
-  subwayLines.addData(data);
-});
 
-/* Single marker cluster layer to hold all clusters */
-var markerClusters = new L.MarkerClusterGroup({
-  spiderfyOnMaxZoom: true,
-  showCoverageOnHover: false,
-  zoomToBoundsOnClick: true,
-  disableClusteringAtZoom: 16,
-  maxClusterRadius: 80,
-  //iconCreateFunction: defineClusterIcon //this is where the magic happens http://bl.ocks.org/gisminister/10001728
-});
 
 
 
@@ -396,9 +581,87 @@ function style(feature) {
     };
 }
 
+/*Function for generating a legend with the same categories as in the clusterPie*/
+function renderLegend() {
+    var data = d3.entries(metadata.data),
+      legenddiv = d3.select('#map').append('div')
+        .attr('id','legend');
+        
+    var heading = legenddiv.append('div')
+        .classed('legendheading', true)
+        .text("Legende");
+
+    var legenditems = legenddiv.selectAll('.legenditem')
+        .data(data);
+        
+    legenditems
+        .enter()
+        .append('div')
+        .attr('class',function(d){return 'category-'+d.value;})
+        .classed({'legenditem': true})
+        .text(function(d){return d.key;});
+}
+
+function numberFormat(n){
+    var rx=  /(\d+)(\d{3})/;
+    return String(n).replace(/^\d+/, function(w){
+        while(rx.test(w)){
+            w= w.replace(rx, '$1 $2');
+        }
+        return w;
+    });
+}
+/*Function for generating a legend */
+/* TODO : refaire ce truc */
+function renderMapLegend(min, max, style_map_color) {
+
+ 	var legenddiv = d3.select('#map').append('div')
+        .attr('id','legend');
+        
+    var heading = legenddiv.append('div')
+        .classed('legendheading', true)
+        .text("Legende");
+
+    var legenditems = legenddiv.selectAll('.legenditem');
+
+	if (style_map_color == "DIV12") {
+	 	var me = legenddiv.append('div');me.append('span').attr('style','background-color:#8e0152').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(95*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#c51b7d').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(85*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#de77ae').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(75*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#f1b6da').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(65*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fde0ef').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(55*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#f7f7f7').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(45*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#e6f5d0').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(35*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#b8e186').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(25*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#7fbc41').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(15*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#4d9221').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(5*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#276419').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' < ' + numberFormat(Math.round(5*(max-min)+min)));
+	}
+	else if (style_map_color == "DIV6") {
+		// DIV6 color
+	 	var me = legenddiv.append('div');me.append('span').attr('style','background-color:#d73027').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(80*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fc8d59').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(60*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fee08b').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(40*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#d9ef8b').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(20*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#91cf60').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(5*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#111').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' < ' + numberFormat(Math.round(5*(max-min)+min)));
+	}
+	else {
+		//"PiYG6", 
+	 	var me = legenddiv.append('div');me.append('span').attr('style','background-color:#8e0152').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(80*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#de77ae').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(60*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fde0ef').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(40*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#b8e186').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(20*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#4dac26').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(5*(max-min)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#111').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' < ' + numberFormat(Math.round(5*(max-min)+min)));
+
+
+	}
+}
+
 
 function getColor(d, style_map_color) {
-
+//colorBrewer
 	if (getURLParameter('style_map_color')  ) {
 		style_map_color = getURLParameter('style_map_color');
 	}
@@ -416,12 +679,14 @@ function getColor(d, style_map_color) {
 	}
 	if (style_map_color == "DIV6") {
 	    d=Math.round(d);
-	    return d > 80 ? '#8e0152' :
-		   d > 60  ? '#de77ae' :
-		   d > 40  ? '#fde0ef' :
-		   d > 20  ? '#b8e186' :
-		   d > 5   ? '#4dac26' :
+	    return d > 80 ? '#d73027' :
+		   d > 60  ? '#fc8d59' :
+		   d > 40  ? '#fee08b' :
+		   d > 20  ? '#d9ef8b' :
+		   d > 5   ? '#91cf60' :
 		              '#111';
+
+
 	}
 	if (style_map_color == "DIV12") {
 	    d=Math.round(d);
@@ -541,11 +806,11 @@ var site_data_department= $.getJSON( "data/departement.geojson", function() {
 	var data = $.getJSON( "data/sample_CA_debut_2014.geojson", function(site_data_department) {
 
 
-	  console.log( "success_AGG" );
+	  //console.log( "success_AGG" );
 	})
 	  .done(function(data) {
 
-	    console.log( "second success_AGG" );
+	    //console.log( "second success_AGG" );
 																																
 		var buckets = [];
 		var doc_count_total =0;
@@ -580,7 +845,7 @@ var site_data_department= $.getJSON( "data/departement.geojson", function() {
 	    console.log( "Request Failed: " + err );
           })
 	  .always(function() {
-	    console.log( "complete_AGG" );
+	    //console.log( "complete_AGG" );
 	  });
 
   })
@@ -588,21 +853,13 @@ var site_data_department= $.getJSON( "data/departement.geojson", function() {
     console.log( "error" );
   })
   .always(function() {
-    console.log( "complete" );
+    //console.log( "complete" );
   });
 
 
 
 
-//utilisé pour faire des heatmaps
-var geoJson2heat = function(geojson, valueField) {
-	return geojson.features.map(function(feature) {
-		return [
-			parseFloat(feature.geometry.coordinates[1]), 
-			parseFloat(feature.geometry.coordinates[0]), 
-			feature.properties[valueField]];
-	});
-}
+
 																																																																																																																			
 
 
@@ -627,33 +884,34 @@ var site_datas = L.geoJson(null, {
    },
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-//http://www.source-organisation.courrier.intra.laposte.fr:8080/ebx/?redirect=/source-organisation/view/close.jsp&branch=BrancheSourceOrganisation&instance=InstanceSourceOrganisation&xpath=/root/D_ENTITE/T_ENTITE[./i_CODE=27303]																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																			
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																			
       var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Code Regate</th><td><a href='http://www.source-organisation.courrier.intra.laposte.fr:8080/ebx/?redirect=/source-organisation/view/close.jsp&branch=BrancheSourceOrganisation&instance=InstanceSourceOrganisation&xpath=/root/D_ENTITE/T_ENTITE[./i_CODE="+ feature.properties.id +"]' target='_blanck'>" + feature.properties.regate_code + "</a></td></tr>" + "<tr><th>Nom</th><td>" + feature.properties.entity_name + "</td></tr>" + "<tr><th>Valeur</th><td>" + feature.properties.value + "</td></tr>" + "<table><iframe src=\"http://localhost:5601/#/dashboard/New-Dashboard?embed&_g=(refreshInterval:(display:Off,section:0,value:0),time:(from:'2015-05-29T13:01:13.587Z',mode:absolute,to:'2015-05-29T14:03:40.226Z'))&_a=(filters:!(),panels:!((col:1,id:carto1,row:1,size_x:3,size_y:2,type:visualization),(col:4,id:facet,row:1,size_x:3,size_y:2,type:visualization),(col:7,id:New-Visualization,row:1,size_x:3,size_y:2,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'*')),title:'New%20Dashboard')\" height=\"600\" width=\"800\"></iframe>";
     																																																																																							  
- layer.on('mouseover mousemove', function(e){
+// layer.on('mouseover mousemove', function(e){
 //ne marche pas !!!!!!
-    //highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
-    //var hover_bubble = new L.Rrose({ offset: new L.Point(0,-1), closeButton: false, autoPan: false })
-    //  .setContent(feature.properties.regate_code + " " +feature.properties.entity_name)
-    //  .setLatLng(e.latlng)
-    //  .openOn(map);
-  });
-  //layer.on('mouseout', function(e){ map.closePopup() });
+//    highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+//    var hover_bubble = new L.Rrose({ offset: new L.Point(0,-1), closeButton: false, autoPan: false })
+//      .setContent(feature.properties.regate_code + " " +feature.properties.entity_name)
+//      .setLatLng(e.latlng)
+//      .openOn(map);
+//  });
+ // layer.on('mouseout', function(e){ map.closePopup() });
 
 
 layer.on({
-        
 	
-click: function (e) {
+      click: function (e) {
           $("#feature-title").html(feature.properties.regate_code + " " +feature.properties.entity_name);
           $("#feature-info").html(content);
           $("#featureModal").modal("show");
           highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
         }
-      });
-      $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/postbox.png"></td><td class="feature-name">' + layer.feature.properties.regate_code + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+});
 
-	site_dataSearch.push({
+
+$("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/postbox.png"></td><td class="feature-name">' + layer.feature.properties.regate_code + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+
+site_dataSearch.push({
         name: layer.feature.properties.regate_code + " " +layer.feature.properties.entity_name,
         source: "Site_datas",
         id: L.stamp(layer),
@@ -696,17 +954,16 @@ function requestData () {
 		data_request = $('#data_request').val();
 	}
 	if (data_request !== "") {
-	console.log(data_request);
-
-
+	
 		//var request = $('#data_request').val();
-		//todo : add json validtr error
+		//todo : add json validtor error
 		//var requestJson = JSON.parse(request);
 
-//		var data = $.post( {"url": decodeURL(), "crossDomain":true, "beforeSend": function (xhr) {xhr.setRequestHeader ("Authorization", "Basic XXXXXX");}, "data": data_request}, function(data_regate) {
-var data = $.post(  decodeURL(), data_request, function(data_regate) {
+		// var data = $.post( {"url": decodeURL(), "crossDomain":true, "beforeSend": function (xhr) {xhr.setRequestHeader ("Authorization", "Basic XXXXXX");}, "data": data_request}, function(data_regate) {
+		var data = $.post(  decodeURL(), data_request, function(data_regate) {
+		//var data = $.getJSON( "data/sample_CA_debut_2014.geojson", function(data_regate) {
 				
-  console.log( "ELASTIC sucess_elastic" );
+  			//console.log( "ELASTIC sucess_elastic" );
 		})
 		  
 		//récupere les données d'elasticsearch
@@ -716,22 +973,74 @@ var data = $.post(  decodeURL(), data_request, function(data_regate) {
 		//})
 		  .done(function(data) {
 
-		    console.log( "ELASTIC second success_AGG" );
-																																
+		    //console.log( "ELASTIC second success_AGG" );
+			//console.log(data);					
 			var buckets = [];
 			var doc_count_total =0;
 			var doc_count_max =0; // used to add color
 			var doc_count_min =0; // used to add color
 			var doc_count_scale =0; // used to add color
-			//for(bucket in data.aggregations.my_agg.buckets) {
+		
+			var sub_agg_terms =[]; //liste des termes dans une sous agregation
+			var sub_agg_terms_count =1;
 			// passe sous forme de tableau les données d'elasticsearch contenues dans le résultat aggregations
+			//plusieurs formats possibles
+			// pas d'agregation
+			// agregation de données : à detailler
+			// double agrégation de données : nombre de TELEPHONE par SITE et par OPERATEUR --> affichera un clusteMap d3pie : sub_sub_agg
+				//my_agg.buckets[].key : regate
+				//my_agg.buckets[].sub_sub_agg.buckets[].key : reseau --> legende
+				//my_agg.buckets[].sub_sub_agg.buckets[].sub_agg.value : valeur
+
 			var bucketsLength=data.aggregations.my_agg.buckets.length;
-			//hack
-			for (var j=1; j<bucketsLength; j++) {
-				buckets[data.aggregations.my_agg.buckets[j].key]=data.aggregations.my_agg.buckets[j].doc_count;
-				doc_count_total = doc_count_total+data.aggregations.my_agg.buckets[j].doc_count;
-				if ( data.aggregations.my_agg.buckets[j].doc_count > doc_count_max) {doc_count_max= data.aggregations.my_agg.buckets[j].doc_count };
-		                if ( data.aggregations.my_agg.buckets[j].doc_count < doc_count_min) {doc_count_min= data.aggregations.my_agg.buckets[j].doc_count };
+			var subBucketsLength;
+
+			// test if there is is sub_agg, to get sub_agg value instead of doc_count
+			var sub_agg = false;
+			if (data.aggregations.my_agg.buckets[0].sub_agg) {sub_agg=true;}
+			// test if there is is sub_sub_agg, to get sub_sub_agg value instead of doc_count and to duplicate data
+			var sub_sub_agg = false;
+			if (data.aggregations.my_agg.buckets[0].sub_sub_agg) {sub_sub_agg=true;}
+
+			for (var j=0; j<bucketsLength; j++) {
+				//console.log(sub_sub_agg);
+				if (sub_sub_agg) {
+
+					subBucketsLength = data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets.length;
+					for (var k=0; k<subBucketsLength; k++) {
+						//recupere la valeur depuis les différents niveaux hierarchique d'elasticsearch et la met dans un tableau
+						//buckets[1erNiveau][2emeNiveau]=valeur	
+						if (!sub_agg_terms[data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]) {
+							sub_agg_terms[data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key] = sub_agg_terms_count;
+							sub_agg_terms_count=sub_agg_terms_count+1;						
+						}
+						//sub_agg_terms[data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]="1";
+						if (!buckets[data.aggregations.my_agg.buckets[j].key]) {
+							buckets[data.aggregations.my_agg.buckets[j].key] = [];
+						}
+						if (!buckets[data.aggregations.my_agg.buckets[j].key][data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]) {
+							buckets[data.aggregations.my_agg.buckets[j].key][data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key] = [];
+						}
+						
+						buckets[data.aggregations.my_agg.buckets[j].key][data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]=data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].sub_agg.value;
+	
+					}
+				}
+				else if (sub_agg) {
+					buckets[data.aggregations.my_agg.buckets[j].key]=data.aggregations.my_agg.buckets[j].sub_agg.value;
+					doc_count_total = doc_count_total+data.aggregations.my_agg.buckets[j].sub_agg.value;
+					if ( data.aggregations.my_agg.buckets[j].sub_agg.value > doc_count_max) {doc_count_max= data.aggregations.my_agg.buckets[j].sub_agg.value};
+		                	if ( data.aggregations.my_agg.buckets[j].sub_agg.value < doc_count_min) {doc_count_min= data.aggregations.my_agg.buckets[j].sub_agg.value };
+				}
+				
+				else {
+					buckets[data.aggregations.my_agg.buckets[j].key]=data.aggregations.my_agg.buckets[j].doc_count;
+					doc_count_total = doc_count_total+data.aggregations.my_agg.buckets[j].doc_count;
+					if ( data.aggregations.my_agg.buckets[j].doc_count > doc_count_max) {doc_count_max= data.aggregations.my_agg.buckets[j].doc_count };
+		                	if ( data.aggregations.my_agg.buckets[j].doc_count < doc_count_min) {doc_count_min= data.aggregations.my_agg.buckets[j].doc_count };
+				}
+				
+				
 			}
 			doc_count_scale = doc_count_max - doc_count_min;
 
@@ -739,29 +1048,68 @@ var data = $.post(  decodeURL(), data_request, function(data_regate) {
 			var featuresLength=data_regate.features.length;
 			for (var i=0; i<featuresLength; i++) {
 			    if (buckets[data_regate.features[i].properties.regate_code]) {
-				data_regate.features[i].properties.value = buckets[data_regate.features[i].properties.regate_code];
-				data_regate.features[i].properties.value_pct = (buckets[data_regate.features[i].properties.regate_code] - doc_count_min) / doc_count_scale * 100;
+				if (sub_sub_agg) {
+					data_regate.features[i].properties.data =buckets[data_regate.features[i].properties.regate_code];					
+				}
+				else {
+					data_regate.features[i].properties.value = buckets[data_regate.features[i].properties.regate_code];
+					data_regate.features[i].properties.value_pct = (buckets[data_regate.features[i].properties.regate_code] - doc_count_min) / doc_count_scale * 100;
+				}
 			    }
 			}
+
+			//ajoute les termes utilises dans le featureCollection
+			if (sub_agg_terms !=="") {
+				data_regate.properties={};
+				data_regate.properties.data=sub_agg_terms;
+			}
 			
+			//console.log(data_regate);
 
 
 		  	site_datas.addData(data_regate);
+			metadata = data_regate.properties;
+
 			map.addLayer(site_dataLayer);
 
-			if (getURLParameter('heatmap_radius')  || getURLParameter('heatmap_blur')) {
-				//add heatmap data to the map
-				var heatmap_radius = 20;
-				if (getURLParameter('heatmap_radius') ) {
-					heatmap_radius = parseInt(getURLParameter('heatmap_radius'));
+			//if sub_sub_agg, display clusterMarker d3pie type
+			if (sub_sub_agg) {
+				var markers = L.geoJson(data_regate, {
+						pointToLayer: defineFeature,
+						onEachFeature: defineFeaturePopup
+				  });
+				  markerClusters.addLayer(markers);
+				renderLegend();
+          	}
+			else {
+				
+
+				// if heatmap, display heatmap  type
+				if (getURLParameter('heatmap_radius')  || getURLParameter('heatmap_blur')) {
+					//add heatmap data to the map
+					var heatmap_radius = 20;
+					if (getURLParameter('heatmap_radius') ) {
+						heatmap_radius = parseInt(getURLParameter('heatmap_radius'));
+					}
+					var heatmap_blur = 17;
+					if (getURLParameter('heatmap_blur') ) {
+						heatmap_blur = parseInt(getURLParameter('heatmap_blur'));
+					}
+					var geoData = geoJson2heat(data_regate, "value"); 
+					//supprime les valeurs nulles (bug heatmap)
+					var geoDataLength=geoData.length;
+					for (var i = 0; i < geoDataLength; i++) {
+						if (geoData[i] && geoData[i][2] ==0) { 
+							  geoData.splice(i, 1);
+							  i--;
+							}
+					}
+					var site_data_heatmapsLayer = L.heatLayer(geoData,{ radius: heatmap_radius,blur: heatmap_blur, maxZoom: 17})
+					map.addLayer(site_data_heatmapsLayer);
 				}
-				var heatmap_blur = 17;
-				if (getURLParameter('heatmap_blur') ) {
-					heatmap_blur = parseInt(getURLParameter('heatmap_blur'));
+				else {
+					renderMapLegend(doc_count_min, doc_count_max, getURLParameter('style_map_color'));
 				}
-				var geoData = geoJson2heat(data_regate, "value"); 
-				var site_data_heatmapsLayer = L.heatLayer(geoData,{ radius: heatmap_radius,blur: heatmap_blur, maxZoom: 17})
-				map.addLayer(site_data_heatmapsLayer);
 			}
 
 		  })
@@ -804,6 +1152,30 @@ map = L.map("map", {
   zoomControl: true,
   attributionControl: false
 });
+
+//map.addLayer(markerClusters);
+
+//d3pie
+ //Ready to go, load the geojson
+ // d3.json(geojsonPath, function(error, data) {
+ //     if (!error) {
+ //         geojson = data;
+ //         metadata = data.properties;
+  //        var markers = L.geoJson(geojson, {
+//			pointToLayer: defineFeature,
+//			onEachFeature: defineFeaturePopup
+//          });
+////          //CSE markerClusters.addLayer(markers);
+//          //map.fitBounds(markers.getBounds());
+//          //map.attributionControl.addAttribution(metadata.attribution);
+//          renderLegend();
+////      } else {
+//	  console.log('Could not load data...');
+//      }
+//  });
+
+
+
 
 /* Layer control listeners that allow for a single markerClusters layer */
 map.on("overlayadd", function(e) {
@@ -860,7 +1232,7 @@ var attributionControl = L.control({
 });
 attributionControl.onAdd = function (map) {
   var div = L.DomUtil.create("div", "leaflet-control-attribution");
-  div.innerHTML = "<span class='hidden-xs'>Developed by claude.seguret@laposte.fr | </span><a href='#' onclick='$(\"#attributionModal\").modal(\"show\"); return false;'>Attribution</a>";
+  div.innerHTML = "<span class='hidden-xs'>Developed by <a href='mailto:claude.seguret@laposte.fr'>clodio</> | </span><a href='#' onclick='$(\"#attributionModal\").modal(\"show\"); return false;'>Attribution</a>";
   return div;
 };
 map.addControl(attributionControl);
