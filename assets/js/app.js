@@ -178,8 +178,9 @@ function defineClusterIcon(cluster) {
 							{
 								count = count + d.values[i];
 							}
-
-							return count;
+							
+								return count;
+							
 			    },
                 strokeWidth: 1,
                 outerRadius: r,
@@ -229,9 +230,14 @@ function bakeThePie(options) {
         strokeWidth = options.strokeWidth?options.strokeWidth:1, //Default stroke is 1
         pathClassFunc = options.pathClassFunc?options.pathClassFunc:function(){return '';}, //Class for each path
         pathTitleFunc = options.pathTitleFunc?options.pathTitleFunc:function(){return '';}, //Title for each path
-        pieClass = options.pieClass?options.pieClass:'marker-cluster-pie', //Class for the whole pie
-        pieLabel = options.pieLabel?options.pieLabel:d3.sum(data,valueFunc), //Label for the whole pie
-        pieLabelClass = options.pieLabelClass?options.pieLabelClass:'marker-cluster-pie-label',//Class for the pie label
+        pieClass = options.pieClass?options.pieClass:'marker-cluster-pie'; //Class for the whole pie
+		
+		var  pieLabel = "";
+		if (d3.sum(data,valueFunc)!=0) {
+			pieLabel =options.pieLabel?options.pieLabel:d3.sum(data,valueFunc); //Label for the whole pie
+		}
+				
+        var  pieLabelClass = options.pieLabelClass?options.pieLabelClass:'marker-cluster-pie-label',//Class for the pie label
         
         origo = (r+strokeWidth), //Center coordinate
         w = origo*2, //width and height of the svg element
