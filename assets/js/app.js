@@ -1,4 +1,4 @@
-var map, featureList, boroughSearch = [],  siteSearch = [],site_dataSearch = [];
+var map, featureList,  siteSearch = [],site_dataSearch = [];
 
 //http://localhost:8080/bootleaf/?style_map_color=&style_map_size=&heatmap_blur=&heatmap_radius=&url=&data_request=%7B%0D%0A++%22query%22%3A+%7B%0D%0A++++%22filtered%22%3A+%7B%0D%0A++++++%22query%22%3A+%7B%0D%0A++++++++%22query_string%22%3A+%7B%0D%0A++++++++++%22analyze_wildcard%22%3A+true%2C%0D%0A++++++++++%22query%22%3A+%22*%22%0D%0A++++++++%7D%0D%0A++++++%7D%2C%0D%0A++++++%22filter%22%3A+%7B%0D%0A++++++++%22bool%22%3A+%7B%0D%0A++++++++++%22must%22%3A+%5B%0D%0A++++++++++++%7B%0D%0A++++++++++++++%22range%22%3A+%7B%0D%0A++++++++++++++++%22%40timestamp%22%3A+%7B%0D%0A++++++++++++++++++%22gte%22%3A+1420066800000%2C%0D%0A++++++++++++++++++%22lte%22%3A+1451602799999%0D%0A++++++++++++++++%7D%0D%0A++++++++++++++%7D%0D%0A++++++++++++%7D%0D%0A++++++++++%5D%2C%0D%0A++++++++++%22must_not%22%3A+%5B%5D%0D%0A++++++++%7D%0D%0A++++++%7D%0D%0A++++%7D%0D%0A++%7D%2C%0D%0A++%22size%22%3A+0%2C%0D%0A++%22aggs%22%3A+%7B%0D%0A++++%22my_agg%22%3A+%7B%0D%0A++++++%22terms%22%3A+%7B%0D%0A++++++++%22field%22%3A+%22regate.raw%22%2C%0D%0A++++++++%22size%22%3A+0%0D%0A++++++%7D%2C%0D%0A++++++%22aggs%22%3A+%7B%0D%0A++++++++%22sub_agg%22%3A+%7B%0D%0A++++++++++%22cardinality%22%3A+%7B%0D%0A++++++++++++%22field%22%3A+%22response.raw%22%0D%0A++++++++++%7D%0D%0A++++++++%7D%2C%0D%0A++++++++%22sub_sub_agg%22%3A+%7B%0D%0A++++++++++%22terms%22%3A+%7B%0D%0A++++++++++++%22field%22%3A+%22verb.raw%22%2C%0D%0A++++++++++++%22size%22%3A+0%0D%0A++++++++++%7D%2C%0D%0A++++++++++%22aggs%22%3A+%7B%0D%0A++++++++++++%22sub_agg%22%3A+%7B%0D%0A++++++++++++++%22cardinality%22%3A+%7B%0D%0A++++++++++++++++%22field%22%3A+%22response.raw%22%0D%0A++++++++++++++%7D%0D%0A++++++++++++%7D%0D%0A++++++++++%7D%0D%0A++++++++%7D%0D%0A++++++%7D%0D%0A++++%7D%0D%0A++%7D%0D%0A%7D
 
@@ -315,8 +315,22 @@ var geoJson2heat = function(geojson, valueField) {
 	});
 }
 
- var geojson,
-    metadata,
+ var geojson;
+ var style_map_color;
+if (getURLParameter('style_map_color')  ) {
+		style_map_color = getURLParameter('style_map_color');
+	}
+	else {
+		style_map_color = "PiYG6"
+	}
+var style_map_size;
+if (getURLParameter('style_map_size')  ) {
+		style_map_size= getURLParameter('style_map_size');
+	}
+	else {
+		style_map_size = "LIN6";
+	}
+var    metadata,
     rmax = 30, //Maximum radius for cluster pies
     markerClusters = L.markerClusterGroup({
       maxClusterRadius: 2*rmax,
@@ -352,7 +366,7 @@ $("#about-btn").click(function() {
 });
 
 $("#full-extent-btn").click(function() {
-  map.fitBounds(boroughs.getBounds());
+  map.fitBounds(map.getBounds());
   $(".navbar-collapse.in").collapse("hide");
   return false;
 });
@@ -452,6 +466,10 @@ function sidebarClick(id, lat, lng) {
 function syncSidebar() {
   	/* Empty sidebar features */
   	$("#feature-list tbody").empty();
+
+if ($("#sidebar").attr('style') !== 'display: none;') {
+   // ...
+ 
   
 	/* Loop through site_data layer and add only features which are in the map bounds */
   	site_datas.eachLayer(function (layer) {
@@ -470,6 +488,7 @@ function syncSidebar() {
 	  featureList.sort("feature-name", {
 		order: "asc"
 	  });
+}
 }
 
 /* Basemap Layers */
@@ -668,14 +687,9 @@ function renderMapLegend(min, max, style_map_color) {
 
 function getColor(d, style_map_color) {
 //colorBrewer
-	if (getURLParameter('style_map_color')  ) {
-		style_map_color = getURLParameter('style_map_color');
-	}
-	else {
-		style_map_color = "PiYG6"
-	}
+	d=Math.round(d);
 	if (style_map_color == "PiYG6") {
-	    d=Math.round(d);
+	    
 	    return d > 80 ? '#8e0152' :
 		   d > 60  ? '#de77ae' :
 		   d > 40  ? '#fde0ef' :
@@ -683,8 +697,8 @@ function getColor(d, style_map_color) {
 		   d > 5   ? '#4dac26' :
 		              '#111';
 	}
-	if (style_map_color == "DIV6") {
-	    d=Math.round(d);
+	else if (style_map_color == "DIV6") {
+
 	    return d > 80 ? '#d73027' :
 		   d > 60  ? '#fc8d59' :
 		   d > 40  ? '#fee08b' :
@@ -694,8 +708,9 @@ function getColor(d, style_map_color) {
 
 
 	}
-	if (style_map_color == "DIV12") {
-	    d=Math.round(d);
+else {
+	///if (style_map_color == "DIV12") {
+
 	   return d > 95 ? '#8e0152' :
 		   d > 85  ? '#c51b7d' :
 		   d > 75  ? '#de77ae' :
@@ -715,15 +730,10 @@ function getColor(d, style_map_color) {
 
 
 function getCircleSize(d, style_map_size) {
-
-	if (getURLParameter('style_map_size')  ) {
-		style_map_size= getURLParameter('style_map_size');
-	}
-	else {
-		style_map_size = "LIN6";
-	}
+d=Math.round(d);
+	
 	if (style_map_size == "LIN6") {
-	    d=Math.round(d);
+	    
 	    return d > 80 ? 16 :
 		   d > 60  ? 14 :
 		   d > 40  ? 12 :
@@ -731,12 +741,13 @@ function getCircleSize(d, style_map_size) {
 		   d > 5   ? 8 :
 		              2;
 	}
-	if (style_map_size == "POINT") {
-	    d=Math.round(d);
+	else if (style_map_size == "POINT") {
+	    
 	    return           2;
 	}
-       if (style_map_size == "LIN10") {
-	    d=Math.round(d);
+    else {
+	//if (style_map_size == "LIN10") {
+	   
 	    return d > 95 ? 18 :
 		   d > 85  ? 17 :
 		   d > 75  ? 16 :
@@ -773,7 +784,7 @@ var site_data_departments = L.geoJson(null, {
   },
   style: function (feature) {
     return {
-        fillColor: getColor(feature.properties.value_pct, 'DIV12'),
+        fillColor: getColor(feature.properties.value_pct, style_map_color),
         weight: 2,
         opacity: 1,
         color: 'white',
@@ -857,7 +868,7 @@ var site_data_department= $.getJSON( "data/departement.geojson", function() {
   })
   .fail(function() {
     console.log( "error" );
-  })
+  }) 
   .always(function() {
     //console.log( "complete" );
   });
@@ -878,8 +889,8 @@ var site_dataLayer = L.geoJson(null);
 var site_datas = L.geoJson(null, {
     pointToLayer:  function (feature, latlng) {
         return L.circleMarker(latlng, {
-					    radius: getCircleSize(feature.properties.value_pct, 'LIN10'),
-					    fillColor: getColor(feature.properties.value_pct, 'DIV12'),
+					    radius: getCircleSize(feature.properties.value_pct, style_map_size),
+					    fillColor: getColor(feature.properties.value_pct, style_map_color),
 					    color: "#fff",
 					    weight: 1,
 					    opacity: 0.9,
@@ -1226,7 +1237,7 @@ map.on("click", function(e) {
 function updateAttribution(e) {
   $.each(map._layers, function(index, layer) {
     if (layer.getAttribution) {
-      $("#attribution").html((layer.getAttribution()));
+      //perf optimisation $("#attribution").html((layer.getAttribution()));
     }
   });
 }
@@ -1341,15 +1352,7 @@ $(document).one("ajaxStop", function () {
   featureList = new List("features", {valueNames: ["feature-name"]});
   featureList.sort("feature-name", {order:"asc"});
 
-  var boroughsBH = new Bloodhound({
-    name: "Arrondissements",
-    datumTokenizer: function (d) {
-      return Bloodhound.tokenizers.whitespace(d.name);
-    },
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    local: boroughSearch,
-    limit: 10
-  });
+  
 
    var sitesBH = new Bloodhound({
     name: "Sites",
@@ -1398,7 +1401,7 @@ $(document).one("ajaxStop", function () {
     },
     limit: 5
   });
-  boroughsBH.initialize();
+
   sitesBH.initialize();
 
 
@@ -1410,13 +1413,6 @@ $(document).one("ajaxStop", function () {
     minLength: 2,
     highlight: true,
     hint: false
-  }, {
-    name: "Boroughs",
-    displayKey: "name",
-    source: boroughsBH.ttAdapter(),
-    templates: {
-      header: "<h4 class='typeahead-header'>Arrondissments</h4>"
-    }
   }, {
     name: "Sites",
     displayKey: "name",
@@ -1433,16 +1429,9 @@ $(document).one("ajaxStop", function () {
       header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;GeoNames</h4>"
     }
   }).on("typeahead:selected", function (obj, datum) {
-    if (datum.source === "Boroughs") {
+     if (datum.source === "Site_datas") {
       map.fitBounds(datum.bounds);
     }
-    if (datum.source === "Site_datas") {
-      map.fitBounds(datum.bounds);
-    }
-    if (datum.source === "Arrondissements") {
-      map.fitBounds(datum.bounds);
-    }
-   
     if (datum.source === "GeoNames") {
       map.setView([datum.lat, datum.lng], 14);
     }
