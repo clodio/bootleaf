@@ -2,7 +2,7 @@ var map, featureList,  siteSearch = [],site_dataSearch = [];
 
 //http://localhost:8080/bootleaf/?style_map_color=&style_map_size=&heatmap_blur=&heatmap_radius=&url=&data_request=%7B%0D%0A++%22query%22%3A+%7B%0D%0A++++%22filtered%22%3A+%7B%0D%0A++++++%22query%22%3A+%7B%0D%0A++++++++%22query_string%22%3A+%7B%0D%0A++++++++++%22analyze_wildcard%22%3A+true%2C%0D%0A++++++++++%22query%22%3A+%22*%22%0D%0A++++++++%7D%0D%0A++++++%7D%2C%0D%0A++++++%22filter%22%3A+%7B%0D%0A++++++++%22bool%22%3A+%7B%0D%0A++++++++++%22must%22%3A+%5B%0D%0A++++++++++++%7B%0D%0A++++++++++++++%22range%22%3A+%7B%0D%0A++++++++++++++++%22%40timestamp%22%3A+%7B%0D%0A++++++++++++++++++%22gte%22%3A+1420066800000%2C%0D%0A++++++++++++++++++%22lte%22%3A+1451602799999%0D%0A++++++++++++++++%7D%0D%0A++++++++++++++%7D%0D%0A++++++++++++%7D%0D%0A++++++++++%5D%2C%0D%0A++++++++++%22must_not%22%3A+%5B%5D%0D%0A++++++++%7D%0D%0A++++++%7D%0D%0A++++%7D%0D%0A++%7D%2C%0D%0A++%22size%22%3A+0%2C%0D%0A++%22aggs%22%3A+%7B%0D%0A++++%22my_agg%22%3A+%7B%0D%0A++++++%22terms%22%3A+%7B%0D%0A++++++++%22field%22%3A+%22regate.raw%22%2C%0D%0A++++++++%22size%22%3A+0%0D%0A++++++%7D%2C%0D%0A++++++%22aggs%22%3A+%7B%0D%0A++++++++%22sub_agg%22%3A+%7B%0D%0A++++++++++%22cardinality%22%3A+%7B%0D%0A++++++++++++%22field%22%3A+%22response.raw%22%0D%0A++++++++++%7D%0D%0A++++++++%7D%2C%0D%0A++++++++%22sub_sub_agg%22%3A+%7B%0D%0A++++++++++%22terms%22%3A+%7B%0D%0A++++++++++++%22field%22%3A+%22verb.raw%22%2C%0D%0A++++++++++++%22size%22%3A+0%0D%0A++++++++++%7D%2C%0D%0A++++++++++%22aggs%22%3A+%7B%0D%0A++++++++++++%22sub_agg%22%3A+%7B%0D%0A++++++++++++++%22cardinality%22%3A+%7B%0D%0A++++++++++++++++%22field%22%3A+%22response.raw%22%0D%0A++++++++++++++%7D%0D%0A++++++++++++%7D%0D%0A++++++++++%7D%0D%0A++++++++%7D%0D%0A++++++%7D%0D%0A++++%7D%0D%0A++%7D%0D%0A%7D
 
-
+//var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "start" );
 
 //d3pie
 function defineFeature(feature, latlng) {
@@ -21,6 +21,7 @@ function defineFeature(feature, latlng) {
 		);
 	}
 	var key_value_cluster =[];
+    var key_value_final = [];
 	var sumCluster =0;
 	//addaptation du format de données pour d3
 	for (var key in feature.properties.data) {
@@ -32,9 +33,6 @@ function defineFeature(feature, latlng) {
 		key_value_cluster[key].push(value);
 		sumCluster= sumCluster +value;
 	}
-
-	// adapt format to match d3 data
-	var key_value_final = [];	
 	for (var key in key_value_cluster) {
 	    if (key === 'length' || !key_value_cluster.hasOwnProperty(key)) continue;
 	    	var value = key_value_cluster[key];
@@ -88,6 +86,8 @@ function defineFeature(feature, latlng) {
 
 }
 
+
+//popo up on d3pie
 function defineFeaturePopup(feature, layer) {
 
 	var props = feature.properties,
@@ -113,6 +113,8 @@ function defineFeaturePopup(feature, layer) {
 
 }
 
+
+//d3pie markercluster icon
 function defineClusterIcon(cluster) {
 //var key_value = [
 //   {
@@ -174,13 +176,10 @@ function defineClusterIcon(cluster) {
                 valueFunc: function(d){
 							var count = 0;
 							var nbItem = d.values.length;
-							for(var i = 0; i < nbItem; i++)
-							{
+							for(var i = 0; i < nbItem; i++)	{
 								count = count + d.values[i];
 							}
-							
-								return count;
-							
+							return count;		
 			    },
                 strokeWidth: 1,
                 outerRadius: r,
@@ -342,7 +341,7 @@ var    metadata,
 	//  maxClusterRadius: 80,
     });
  
-
+//var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "init" );
 
 $(window).resize(function() {
   sizeLayerControl();
@@ -429,7 +428,7 @@ function getURLParameter(sParam) {
 }
 $( document ).ready(function() {
   // Handler for .ready() called.
-
+//var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "ready" );
 	// Récupération des paramètres d'url
 	$('#style_map_color').val(getURLParameter('style_map_color'));
 	$('#style_map_size').val(getURLParameter('style_map_size'));
@@ -443,6 +442,7 @@ $( document ).ready(function() {
 		$('#title').val(decodeURIComponent(getURLParameter('title')));
 		renderTitle($('#title').val());
 	}
+//var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "end ready" );
 });
 
 function sidebarClick(id, lat, lng) {
@@ -473,11 +473,11 @@ if ($("#sidebar").attr('style') !== 'display: none;') {
   
 	/* Loop through site_data layer and add only features which are in the map bounds */
   	site_datas.eachLayer(function (layer) {
-		if (map.hasLayer(site_dataLayer)) {
+		//CSEOptimisation if (map.hasLayer(site_dataLayer)) {
 		  if (map.getBounds().contains(layer.getLatLng())) {
 		    $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/factory.png"></td><td class="feature-name">' + layer.feature.properties.regate_code + ' ' + layer.feature.properties.entity_name + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
 		  }
-		}
+		//}
 	  });
   
 
@@ -568,9 +568,9 @@ var departments = L.geoJson(null, {
     };
   }
 });
-$.getJSON("data/departement.geojson", function (data) {
-  departments.addData(data);
-});
+//$.getJSON("data/departement.geojson", function (data) {
+//  departments.addData(data);
+//});
 
 
 
@@ -763,10 +763,305 @@ d=Math.round(d);
 }
 
 
-//L.geoJson(statesData, {style: style}).addTo(map);
 
-//var d3Layer = new L.GeoJSON.d3({...insert geojson here...});
-//var map = new L.Map("map").addLayer(d3Layer);
+
+//var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "sitedatat" );
+
+/* Empty layer placeholder to add to layer control for listening when to add/remove elasticsearch regate to markerClusters layer */
+var site_dataLayer = L.geoJson(null);
+var site_datas = L.geoJson(null, {
+    pointToLayer:  function (feature, latlng) {
+        return L.circleMarker(latlng, {
+					    radius: getCircleSize(feature.properties.value_pct, style_map_size),
+					    fillColor: getColor(feature.properties.value_pct, style_map_color),
+					    color: "#fff",
+					    weight: 1,
+					    opacity: 0.9,
+					    fillOpacity: 0.9
+					}
+				)
+																																																																																																																																								
+   },
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																			
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Code Regate</th><td><a href='http://www.source-organisation.courrier.intra.laposte.fr:8080/ebx/?redirect=/source-organisation/view/close.jsp&branch=BrancheSourceOrganisation&instance=InstanceSourceOrganisation&xpath=/root/D_ENTITE/T_ENTITE[./i_CODE="+ feature.properties.id +"]' target='_blanck'>" + feature.properties.regate_code + "</a></td></tr>" + "<tr><th>Nom</th><td>" + feature.properties.entity_name + "</td></tr>" + "<tr><th>Valeur</th><td>" + feature.properties.value + "</td></tr>" + "<table><iframe src=\"http://localhost:5601/#/dashboard/New-Dashboard?embed&_g=(refreshInterval:(display:Off,section:0,value:0),time:(from:'2015-05-29T13:01:13.587Z',mode:absolute,to:'2015-05-29T14:03:40.226Z'))&_a=(filters:!(),panels:!((col:1,id:carto1,row:1,size_x:3,size_y:2,type:visualization),(col:4,id:facet,row:1,size_x:3,size_y:2,type:visualization),(col:7,id:New-Visualization,row:1,size_x:3,size_y:2,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'*')),title:'New%20Dashboard')\" height=\"600\" width=\"800\"></iframe>";
+    																																																																																							  
+// layer.on('mouseover mousemove', function(e){
+//ne marche pas !!!!!!
+//    highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+//    var hover_bubble = new L.Rrose({ offset: new L.Point(0,-1), closeButton: false, autoPan: false })
+//      .setContent(feature.properties.regate_code + " " +feature.properties.entity_name)
+//      .setLatLng(e.latlng)
+//      .openOn(map);
+//  });
+ // layer.on('mouseout', function(e){ map.closePopup() });
+
+
+	layer.on({
+	
+		  click: function (e) {
+		      $("#feature-title").html(feature.properties.regate_code + " " +feature.properties.entity_name);
+		      $("#feature-info").html(content);
+		      $("#featureModal").modal("show");
+		      highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+		    }
+	});
+
+
+//$("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/postbox.png"></td><td class="feature-name">' + layer.feature.properties.regate_code + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+
+	site_dataSearch.push({
+		    name: layer.feature.properties.regate_code + " " +layer.feature.properties.entity_name,
+		    source: "Site_datas",
+		    id: L.stamp(layer),
+		    bounds: layer.getBounds(),
+		    lat: layer.feature.geometry.coordinates[1],
+		    lng: layer.feature.geometry.coordinates[0]
+
+		  });
+		}
+	  }
+});
+
+//var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "end geojson" );
+// CORS error + format : $.getJSON("http://public.opendatasoft.com/explore/dataset/points-dinterets-openstreetmap-en-france/download/?format=geojson&refine.operator=La%20Poste&refine.amenity=post_box&timezone=Europe/Berlin", function (data) {
+
+function decodeURL () {
+	
+	if (typeof(getURLParameter('url')) == "undefined" ||  getURLParameter('url') == "" ) {
+		return "http://localhost:9200/_search";
+	}	
+	else {
+		return decodeURIComponent(getURLParameter('url')).toString();
+	}	
+}
+
+
+
+
+function requestData () {
+	// Récupere les données cartographiques
+	var data_regate = $.getJSON( "data/sites_regate.geojson", function() {
+	  
+	})
+	  .done(function(data_regate) {
+
+	    //var tmpDate = new Date();console.log(tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "success elasticsearch" );
+
+	
+	var data_request = decodeURIComponent(getURLParameter('data_request')).replace(/[Nn]ow\+-/g,'now-').replace(/[Nn]ow\++/g,'now#').replace(/\+/g,' ').replace(/now\#/g,'now+');
+	if (data_request && data_request != "undefined") {
+		$('#data_request').val(data_request)
+	}
+	else {
+		data_request = $('#data_request').val();
+	}
+	if (data_request !== "") {
+	
+		//var request = $('#data_request').val();
+		//todo : add json validtor error
+		//var requestJson = JSON.parse(request);
+
+		// var data = $.post( {"url": decodeURL(), "crossDomain":true, "beforeSend": function (xhr) {xhr.setRequestHeader ("Authorization", "Basic XXXXXX");}, "data": data_request}, function(data_regate) {
+		var data = $.post(  decodeURL(), data_request, function(data_regate) {
+		//var data = $.getJSON( "data/sample_CA_debut_2014.geojson", function(data_regate) {
+				
+  			//var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "ELASTIC sucess_elastic" );
+		})
+		  
+		//récupere les données d'elasticsearch
+		//var data = $.getJSON( "data/sample_response_aggregation.geojson", function(data_regate) {
+		//var data = $.getJSON( "data/sample_CA_debut_2014.geojson", function(data_regate) {
+		//  console.log( "success_AGG" );
+		//})
+		  .done(function(data) {
+
+		    //var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "ELASTIC second success_AGG" );
+			//console.log(data);					
+			var buckets = [];
+			var doc_count_total =0;
+			var doc_count_max =0; // used to add color
+			var doc_count_min =0; // used to add color
+			var doc_count_scale =0; // used to add color
+		
+			var sub_agg_terms =[]; //liste des termes dans une sous agregation
+			var sub_agg_terms_count =1;
+			// passe sous forme de tableau les données d'elasticsearch contenues dans le résultat aggregations
+			//plusieurs formats possibles
+			// pas d'agregation
+			// agregation de données : à detailler
+			// double agrégation de données : nombre de TELEPHONE par SITE et par OPERATEUR --> affichera un clusteMap d3pie : sub_sub_agg
+				//my_agg.buckets[].key : regate
+				//my_agg.buckets[].sub_sub_agg.buckets[].key : reseau --> legende
+				//my_agg.buckets[].sub_sub_agg.buckets[].sub_agg.value : valeur
+
+			var bucketsLength=data.aggregations.my_agg.buckets.length;
+			var subBucketsLength;
+
+			// test if there is is sub_agg, to get sub_agg value instead of doc_count
+			var sub_agg = false;
+			if (data.aggregations.my_agg.buckets[0].sub_agg) {sub_agg=true;}
+			// test if there is is sub_sub_agg, to get sub_sub_agg value instead of doc_count and to duplicate data
+			var sub_sub_agg = false;
+			if (data.aggregations.my_agg.buckets[0].sub_sub_agg) {sub_sub_agg=true;}
+
+			for (var j=0; j<bucketsLength; j++) {
+				//console.log(sub_sub_agg);
+				if (sub_sub_agg) {
+
+					subBucketsLength = data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets.length;
+					for (var k=0; k<subBucketsLength; k++) {
+						//recupere la valeur depuis les différents niveaux hierarchique d'elasticsearch et la met dans un tableau
+						//buckets[1erNiveau][2emeNiveau]=valeur	
+						if (!sub_agg_terms[data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]) {
+							sub_agg_terms[data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key] = sub_agg_terms_count;
+							sub_agg_terms_count=sub_agg_terms_count+1;						
+						}
+						//sub_agg_terms[data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]="1";
+						if (!buckets[data.aggregations.my_agg.buckets[j].key]) {
+							buckets[data.aggregations.my_agg.buckets[j].key] = [];
+						}
+						if (!buckets[data.aggregations.my_agg.buckets[j].key][data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]) {
+							buckets[data.aggregations.my_agg.buckets[j].key][data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key] = [];
+						}
+						
+						buckets[data.aggregations.my_agg.buckets[j].key][data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]=data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].sub_agg.value;
+	
+					}
+				}
+				else if (sub_agg) {
+					buckets[data.aggregations.my_agg.buckets[j].key]=data.aggregations.my_agg.buckets[j].sub_agg.value;
+					doc_count_total = doc_count_total+data.aggregations.my_agg.buckets[j].sub_agg.value;
+					if ( data.aggregations.my_agg.buckets[j].sub_agg.value > doc_count_max) {doc_count_max= data.aggregations.my_agg.buckets[j].sub_agg.value};
+		                	if ( data.aggregations.my_agg.buckets[j].sub_agg.value < doc_count_min) {doc_count_min= data.aggregations.my_agg.buckets[j].sub_agg.value };
+				}
+				
+				else {
+					buckets[data.aggregations.my_agg.buckets[j].key]=data.aggregations.my_agg.buckets[j].doc_count;
+					doc_count_total = doc_count_total+data.aggregations.my_agg.buckets[j].doc_count;
+					if ( data.aggregations.my_agg.buckets[j].doc_count > doc_count_max) {doc_count_max= data.aggregations.my_agg.buckets[j].doc_count };
+		                	if ( data.aggregations.my_agg.buckets[j].doc_count < doc_count_min) {doc_count_min= data.aggregations.my_agg.buckets[j].doc_count };
+				}
+				
+				
+			}
+			doc_count_scale = doc_count_max - doc_count_min;
+
+		    //var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "Fin calculs" );
+			// modifie le geoJson pour ajouter les valeurs
+			var featuresLength=data_regate.features.length;
+			for (var i=0; i<featuresLength; i++) {
+			    if (buckets[data_regate.features[i].properties.regate_code]) {
+				if (sub_sub_agg) {
+					data_regate.features[i].properties.data =buckets[data_regate.features[i].properties.regate_code];					
+				}
+				else {
+					data_regate.features[i].properties.value = buckets[data_regate.features[i].properties.regate_code];
+					data_regate.features[i].properties.value_pct = (buckets[data_regate.features[i].properties.regate_code] - doc_count_min) / doc_count_scale * 100;
+				}
+			    }
+			}
+		    
+			//ajoute les termes utilises dans le featureCollection
+			if (sub_agg_terms !=="") {
+				data_regate.properties={};
+				data_regate.properties.data=sub_agg_terms;
+			}
+			
+			//console.log(data_regate);
+//var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "Fin calculs pourcentages" );
+
+		  	site_datas.addData(data_regate);
+			metadata = data_regate.properties;
+		    //var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "Fin addData" );
+			//map.addLayer(site_dataLayer);
+
+			//if sub_sub_agg, display clusterMarker d3pie type
+			if (sub_sub_agg) {
+				var markers = L.geoJson(data_regate, {
+						pointToLayer: defineFeature,
+						onEachFeature: defineFeaturePopup
+				  });
+				  markerClusters.addLayer(markers);
+				renderLegend();
+		    //var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "Fin markerCluster" );
+          	}
+			else {
+				
+
+				// if heatmap, display heatmap  type
+				if (getURLParameter('heatmap_radius')  || getURLParameter('heatmap_blur')) {
+					//add heatmap data to the map
+					var heatmap_radius = 20;
+					if (getURLParameter('heatmap_radius') ) {
+						heatmap_radius = parseInt(getURLParameter('heatmap_radius'));
+					}
+					var heatmap_blur = 17;
+					if (getURLParameter('heatmap_blur') ) {
+						heatmap_blur = parseInt(getURLParameter('heatmap_blur'));
+					}
+					var geoData = geoJson2heat(data_regate, "value"); 
+					//supprime les valeurs nulles (bug heatmap)
+					var geoDataLength=geoData.length;
+					for (var i = 0; i < geoDataLength; i++) {
+						if (geoData[i] && geoData[i][2] ==0) { 
+							  geoData.splice(i, 1);
+							  i--;
+							}
+					}
+					var site_data_heatmapsLayer = L.heatLayer(geoData,{ radius: heatmap_radius,blur: heatmap_blur, maxZoom: 17})
+					map.addLayer(site_data_heatmapsLayer);
+				}
+				else {
+					renderMapLegend(doc_count_min, doc_count_max, getURLParameter('style_map_color'));
+				}
+			}
+
+		  })
+		 .fail(function( jqxhr, textStatus, error ) {
+		    var err = textStatus + ", " + error;
+		    console.log( "Request Failed: " + err );
+		  })
+		  .always(function() {
+		    //console.log( "complete_AGG" );
+		  });
+	}
+
+	  })
+	  .fail(function( jqxhr, textStatus, error ) {
+		    var err = textStatus + ", " + error;
+		    console.log( "Request Failed: " + err );
+		  })
+	  .always(function() {
+	    //console.log( "complete" );
+		    //var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "Fin complete" );
+	  });
+
+}
+requestData();
+
+
+
+
+
+
+
+
+
+
+
+
+map = L.map("map", {
+  zoom: 6,
+  center: [46.9996919,3.1241694],
+  layers: [mapquestOSM, site_datas, markerClusters, highlight],
+  zoomControl: true,
+  attributionControl: false
+});
+
+
+
 
 var site_data_departmentLayer = L.geoJson(null);
 var site_data_departments = L.geoJson(null, {
@@ -872,304 +1167,6 @@ var site_data_department= $.getJSON( "data/departement.geojson", function() {
   .always(function() {
     //console.log( "complete" );
   });
-
-
-
-
-
-																																																																																																																			
-
-
-
-
-
-
-/* Empty layer placeholder to add to layer control for listening when to add/remove elasticsearch regate to markerClusters layer */
-var site_dataLayer = L.geoJson(null);
-var site_datas = L.geoJson(null, {
-    pointToLayer:  function (feature, latlng) {
-        return L.circleMarker(latlng, {
-					    radius: getCircleSize(feature.properties.value_pct, style_map_size),
-					    fillColor: getColor(feature.properties.value_pct, style_map_color),
-					    color: "#fff",
-					    weight: 1,
-					    opacity: 0.9,
-					    fillOpacity: 0.9
-					}
-				)
-																																																																																																																																								
-   },
-  onEachFeature: function (feature, layer) {
-    if (feature.properties) {
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																			
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Code Regate</th><td><a href='http://www.source-organisation.courrier.intra.laposte.fr:8080/ebx/?redirect=/source-organisation/view/close.jsp&branch=BrancheSourceOrganisation&instance=InstanceSourceOrganisation&xpath=/root/D_ENTITE/T_ENTITE[./i_CODE="+ feature.properties.id +"]' target='_blanck'>" + feature.properties.regate_code + "</a></td></tr>" + "<tr><th>Nom</th><td>" + feature.properties.entity_name + "</td></tr>" + "<tr><th>Valeur</th><td>" + feature.properties.value + "</td></tr>" + "<table><iframe src=\"http://localhost:5601/#/dashboard/New-Dashboard?embed&_g=(refreshInterval:(display:Off,section:0,value:0),time:(from:'2015-05-29T13:01:13.587Z',mode:absolute,to:'2015-05-29T14:03:40.226Z'))&_a=(filters:!(),panels:!((col:1,id:carto1,row:1,size_x:3,size_y:2,type:visualization),(col:4,id:facet,row:1,size_x:3,size_y:2,type:visualization),(col:7,id:New-Visualization,row:1,size_x:3,size_y:2,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'*')),title:'New%20Dashboard')\" height=\"600\" width=\"800\"></iframe>";
-    																																																																																							  
-// layer.on('mouseover mousemove', function(e){
-//ne marche pas !!!!!!
-//    highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
-//    var hover_bubble = new L.Rrose({ offset: new L.Point(0,-1), closeButton: false, autoPan: false })
-//      .setContent(feature.properties.regate_code + " " +feature.properties.entity_name)
-//      .setLatLng(e.latlng)
-//      .openOn(map);
-//  });
- // layer.on('mouseout', function(e){ map.closePopup() });
-
-
-layer.on({
-	
-      click: function (e) {
-          $("#feature-title").html(feature.properties.regate_code + " " +feature.properties.entity_name);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
-          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
-        }
-});
-
-
-$("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/postbox.png"></td><td class="feature-name">' + layer.feature.properties.regate_code + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
-
-site_dataSearch.push({
-        name: layer.feature.properties.regate_code + " " +layer.feature.properties.entity_name,
-        source: "Site_datas",
-        id: L.stamp(layer),
-        bounds: layer.getBounds(),
-        lat: layer.feature.geometry.coordinates[1],
-        lng: layer.feature.geometry.coordinates[0]
-
-      });
-    }
-  }
-});
-// CORS error + format : $.getJSON("http://public.opendatasoft.com/explore/dataset/points-dinterets-openstreetmap-en-france/download/?format=geojson&refine.operator=La%20Poste&refine.amenity=post_box&timezone=Europe/Berlin", function (data) {
-
-function decodeURL () {
-	
-	if (typeof(getURLParameter('url')) == "undefined" ||  getURLParameter('url') == "" ) {
-		return "http://localhost:9200/_search";
-	}	
-	else {
-		return decodeURIComponent(getURLParameter('url')).toString();
-	}	
-}
-
-
-function requestData () {
-	// Récupere les données cartographiques
-	var data_regate = $.getJSON( "data/sites_regate.geojson", function() {
-	  
-	})
-	  .done(function(data_regate) {
-
-	    //console.log( "success elasticsearch" );
-
-	
-	var data_request = decodeURIComponent(getURLParameter('data_request')).replace(/[Nn]ow\+-/g,'now-').replace(/[Nn]ow\++/g,'now#').replace(/\+/g,' ').replace(/now\#/g,'now+');
-	if (data_request && data_request != "undefined") {
-		$('#data_request').val(data_request)
-	}
-	else {
-		data_request = $('#data_request').val();
-	}
-	if (data_request !== "") {
-	
-		//var request = $('#data_request').val();
-		//todo : add json validtor error
-		//var requestJson = JSON.parse(request);
-
-		// var data = $.post( {"url": decodeURL(), "crossDomain":true, "beforeSend": function (xhr) {xhr.setRequestHeader ("Authorization", "Basic XXXXXX");}, "data": data_request}, function(data_regate) {
-		var data = $.post(  decodeURL(), data_request, function(data_regate) {
-		//var data = $.getJSON( "data/sample_CA_debut_2014.geojson", function(data_regate) {
-				
-  			//console.log( "ELASTIC sucess_elastic" );
-		})
-		  
-		//récupere les données d'elasticsearch
-		//var data = $.getJSON( "data/sample_response_aggregation.geojson", function(data_regate) {
-		//var data = $.getJSON( "data/sample_CA_debut_2014.geojson", function(data_regate) {
-		//  console.log( "success_AGG" );
-		//})
-		  .done(function(data) {
-
-		    //console.log( "ELASTIC second success_AGG" );
-			//console.log(data);					
-			var buckets = [];
-			var doc_count_total =0;
-			var doc_count_max =0; // used to add color
-			var doc_count_min =0; // used to add color
-			var doc_count_scale =0; // used to add color
-		
-			var sub_agg_terms =[]; //liste des termes dans une sous agregation
-			var sub_agg_terms_count =1;
-			// passe sous forme de tableau les données d'elasticsearch contenues dans le résultat aggregations
-			//plusieurs formats possibles
-			// pas d'agregation
-			// agregation de données : à detailler
-			// double agrégation de données : nombre de TELEPHONE par SITE et par OPERATEUR --> affichera un clusteMap d3pie : sub_sub_agg
-				//my_agg.buckets[].key : regate
-				//my_agg.buckets[].sub_sub_agg.buckets[].key : reseau --> legende
-				//my_agg.buckets[].sub_sub_agg.buckets[].sub_agg.value : valeur
-
-			var bucketsLength=data.aggregations.my_agg.buckets.length;
-			var subBucketsLength;
-
-			// test if there is is sub_agg, to get sub_agg value instead of doc_count
-			var sub_agg = false;
-			if (data.aggregations.my_agg.buckets[0].sub_agg) {sub_agg=true;}
-			// test if there is is sub_sub_agg, to get sub_sub_agg value instead of doc_count and to duplicate data
-			var sub_sub_agg = false;
-			if (data.aggregations.my_agg.buckets[0].sub_sub_agg) {sub_sub_agg=true;}
-
-			for (var j=0; j<bucketsLength; j++) {
-				//console.log(sub_sub_agg);
-				if (sub_sub_agg) {
-
-					subBucketsLength = data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets.length;
-					for (var k=0; k<subBucketsLength; k++) {
-						//recupere la valeur depuis les différents niveaux hierarchique d'elasticsearch et la met dans un tableau
-						//buckets[1erNiveau][2emeNiveau]=valeur	
-						if (!sub_agg_terms[data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]) {
-							sub_agg_terms[data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key] = sub_agg_terms_count;
-							sub_agg_terms_count=sub_agg_terms_count+1;						
-						}
-						//sub_agg_terms[data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]="1";
-						if (!buckets[data.aggregations.my_agg.buckets[j].key]) {
-							buckets[data.aggregations.my_agg.buckets[j].key] = [];
-						}
-						if (!buckets[data.aggregations.my_agg.buckets[j].key][data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]) {
-							buckets[data.aggregations.my_agg.buckets[j].key][data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key] = [];
-						}
-						
-						buckets[data.aggregations.my_agg.buckets[j].key][data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].key]=data.aggregations.my_agg.buckets[j].sub_sub_agg.buckets[k].sub_agg.value;
-	
-					}
-				}
-				else if (sub_agg) {
-					buckets[data.aggregations.my_agg.buckets[j].key]=data.aggregations.my_agg.buckets[j].sub_agg.value;
-					doc_count_total = doc_count_total+data.aggregations.my_agg.buckets[j].sub_agg.value;
-					if ( data.aggregations.my_agg.buckets[j].sub_agg.value > doc_count_max) {doc_count_max= data.aggregations.my_agg.buckets[j].sub_agg.value};
-		                	if ( data.aggregations.my_agg.buckets[j].sub_agg.value < doc_count_min) {doc_count_min= data.aggregations.my_agg.buckets[j].sub_agg.value };
-				}
-				
-				else {
-					buckets[data.aggregations.my_agg.buckets[j].key]=data.aggregations.my_agg.buckets[j].doc_count;
-					doc_count_total = doc_count_total+data.aggregations.my_agg.buckets[j].doc_count;
-					if ( data.aggregations.my_agg.buckets[j].doc_count > doc_count_max) {doc_count_max= data.aggregations.my_agg.buckets[j].doc_count };
-		                	if ( data.aggregations.my_agg.buckets[j].doc_count < doc_count_min) {doc_count_min= data.aggregations.my_agg.buckets[j].doc_count };
-				}
-				
-				
-			}
-			doc_count_scale = doc_count_max - doc_count_min;
-
-			// modifie le geoJson pour ajouter les valeurs
-			var featuresLength=data_regate.features.length;
-			for (var i=0; i<featuresLength; i++) {
-			    if (buckets[data_regate.features[i].properties.regate_code]) {
-				if (sub_sub_agg) {
-					data_regate.features[i].properties.data =buckets[data_regate.features[i].properties.regate_code];					
-				}
-				else {
-					data_regate.features[i].properties.value = buckets[data_regate.features[i].properties.regate_code];
-					data_regate.features[i].properties.value_pct = (buckets[data_regate.features[i].properties.regate_code] - doc_count_min) / doc_count_scale * 100;
-				}
-			    }
-			}
-
-			//ajoute les termes utilises dans le featureCollection
-			if (sub_agg_terms !=="") {
-				data_regate.properties={};
-				data_regate.properties.data=sub_agg_terms;
-			}
-			
-			//console.log(data_regate);
-
-
-		  	site_datas.addData(data_regate);
-			metadata = data_regate.properties;
-
-			map.addLayer(site_dataLayer);
-
-			//if sub_sub_agg, display clusterMarker d3pie type
-			if (sub_sub_agg) {
-				var markers = L.geoJson(data_regate, {
-						pointToLayer: defineFeature,
-						onEachFeature: defineFeaturePopup
-				  });
-				  markerClusters.addLayer(markers);
-				renderLegend();
-          	}
-			else {
-				
-
-				// if heatmap, display heatmap  type
-				if (getURLParameter('heatmap_radius')  || getURLParameter('heatmap_blur')) {
-					//add heatmap data to the map
-					var heatmap_radius = 20;
-					if (getURLParameter('heatmap_radius') ) {
-						heatmap_radius = parseInt(getURLParameter('heatmap_radius'));
-					}
-					var heatmap_blur = 17;
-					if (getURLParameter('heatmap_blur') ) {
-						heatmap_blur = parseInt(getURLParameter('heatmap_blur'));
-					}
-					var geoData = geoJson2heat(data_regate, "value"); 
-					//supprime les valeurs nulles (bug heatmap)
-					var geoDataLength=geoData.length;
-					for (var i = 0; i < geoDataLength; i++) {
-						if (geoData[i] && geoData[i][2] ==0) { 
-							  geoData.splice(i, 1);
-							  i--;
-							}
-					}
-					var site_data_heatmapsLayer = L.heatLayer(geoData,{ radius: heatmap_radius,blur: heatmap_blur, maxZoom: 17})
-					map.addLayer(site_data_heatmapsLayer);
-				}
-				else {
-					renderMapLegend(doc_count_min, doc_count_max, getURLParameter('style_map_color'));
-				}
-			}
-
-		  })
-		 .fail(function( jqxhr, textStatus, error ) {
-		    var err = textStatus + ", " + error;
-		    console.log( "Request Failed: " + err );
-		  })
-		  .always(function() {
-		    //console.log( "complete_AGG" );
-		  });
-	}
-
-	  })
-	  .fail(function( jqxhr, textStatus, error ) {
-		    var err = textStatus + ", " + error;
-		    console.log( "Request Failed: " + err );
-		  })
-	  .always(function() {
-	    //console.log( "complete" );
-	  });
-
-}
-requestData();
-
-
-
-
-
-
-
-
-
-
-
-
-map = L.map("map", {
-  zoom: 6,
-  center: [46.9996919,3.1241694],
-  layers: [mapquestOSM, site_datas, markerClusters, highlight],
-  zoomControl: true,
-  attributionControl: false
-});
-
 //map.addLayer(markerClusters);
 
 //d3pie
