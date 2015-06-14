@@ -1308,10 +1308,10 @@ var baseLayers = {
 };
 
 var groupedOverlays = {
-  "Points d'interêts": {
+  //"Points d'interêts": {
     //"<img src='assets/img/postbox.png' width='24' height='28'>&nbsp;Boites jaunes": postboxLayer ,
-     "<img src='assets/img/factory.png' width='24' height='28'>&nbsp;Sites": site_dataLayer
-  },
+   //  "<img src='assets/img/factory.png' width='24' height='28'>&nbsp;Sites": site_dataLayer
+  //},
   "Analyses": {
   
     "Analyse par site": site_datas,
@@ -1400,9 +1400,6 @@ $(document).one("ajaxStop", function () {
   });
 
   sitesBH.initialize();
-
-
-
   geonamesBH.initialize();
 
   /* instantiate the typeahead UI */
