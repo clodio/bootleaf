@@ -95,6 +95,43 @@
   background: #CCC;
   border-color: #444;
 }
+.category-7{
+  fill: #CCC;
+  stroke: #fdbf6f;
+  background: #CCC;
+  border-color: #fdbf6f;
+}
+.category-8{
+  fill: #ff7f00;
+  stroke: #444;
+  background: #CCC;
+  border-color: #ff7f00;
+}
+.category-9{
+  fill: #cab2d6;
+  stroke: #444;
+  background: #cab2d6;
+  border-color: #444;
+}
+.category-10{
+  fill: #6a3d9a;
+  stroke: #444;
+  background: #6a3d9a;
+  border-color: #444;
+}
+.category-11{
+  fill: #ffff99;
+  stroke: #444;
+  background: #ffff99;
+  border-color: #444;
+}
+.category-12{
+  fill: #b15928;
+  stroke: #444;
+  background: #b15928;
+  border-color: #444;
+}
+
 
 /*marker icons*/
 .icon-1{
