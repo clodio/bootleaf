@@ -830,7 +830,7 @@ var site_datas = L.geoJson(null, {
 function decodeURL () {
 	
 	if (typeof(getURLParameter('url')) == "undefined" ||  getURLParameter('url') == "" ) {
-		return "http://localhost:9200/_search";
+		return "http://kibana-ist.net2-courrier.extra.laposte.fr:9200/_search";
 	}	
 	else {
 		return decodeURIComponent(getURLParameter('url')).toString();
@@ -1362,8 +1362,123 @@ $(document).one("ajaxStop", function () {
   });
 
 
- 
 
+
+var imeiBH = new Bloodhound({
+    name: "Telephones",
+    datumTokenizer: function (d) {
+      return Bloodhound.tokenizers.whitespace(d.name);
+    },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+//remote: {"url":'/search?q=%QUERY&size=5&fields=mob_regate,bytes'},
+//http://localhost:9200/_search?q=bytes:2*&size=2&fields=mob_regate,bytes
+
+
+        url: "http://kibana-ist.net2-courrier.extra.laposte.fr:9200/_search",
+
+        replace: function(url, query) {
+            return url + "#" + query;
+        },
+
+      //url:'http://localhost:9200/_search?q=%QUERY&size=1&fields=mob_regate,bytes',
+      filter: function (data) {
+		
+        return $.map(data.aggregations.agg_regate.buckets, function (result) {
+			console.log(result); 
+			//console.log(result.fields);
+			//console.log(result.fields.mob_regate[0]+ ", " + result.fields.bytes[0]);          
+			return {
+		        name: 'Regate:' + result.key+ ", IMEI:" + result.agg_imei.buckets[0].key, //,
+	//            lat: result.lat,
+	  //          lng: result.lng,
+	  			search: result.key,
+		        source: "Telephones"
+		      };
+        });
+      },
+      ajax: {
+        beforeSend: function (jqXhr, settings) {
+          //settings.url += "&east=" + map.getBounds().getEast() + "&west=" + map.getBounds().getWest() + "&north=" + map.getBounds().getNorth() + "&south=" + map.getBounds().getSouth();
+          $("#searchicon").removeClass("fa-search").addClass("fa-refresh fa-spin");
+
+          var requestJson = {
+										  "query": {
+											"filtered": {
+											  "query": {
+												"query_string": {
+												  "query": "bytes:" + $("#searchbox").val() + "*",
+												  "analyze_wildcard": true
+												}
+											  },
+											  "filter": {
+												"bool": {
+												  "must": [
+													{
+													  "range": {
+														"@timestamp": {
+														  "gte": "now-7d/d"
+														}
+													  }
+													}
+												  ],
+												  "must_not": []
+												}
+											  }
+											}
+										  },
+										  "size": 0,
+										  "aggs": {
+											"agg_regate": {
+											  "terms": {
+												"field": "regate.raw",
+												"size": 5,
+												"order": {
+												  "agg_cardinality": "desc"
+												}
+											  },
+											  "aggs": {
+												"agg_cardinality": {
+												  "cardinality": {
+													"field": "response.raw"
+												  }
+												},
+												"agg_imei": {
+												  "terms": {
+													"field": "bytes.raw",
+													"size": 5,
+													"order": {
+													  "agg_cardinality": "desc"
+													}
+												  },
+												  "aggs": {
+													"agg_cardinality": {
+													  "cardinality": {
+														"field": "response.raw"
+													  }
+													}
+												  }
+												}
+											  }
+											}
+										  }
+										};
+				    settings.data= JSON.stringify(requestJson);
+					settings.contentType= "application/json; charset=utf-8";
+					settings.dataType= "json";
+
+            }
+        ,
+            type: "POST"
+
+        },
+      complete: function (jqXHR, status) {
+          $('#searchicon').removeClass("fa-refresh fa-spin").addClass("fa-search");
+      }
+      
+    },
+    limit: 4
+  });
   
 
   
@@ -1400,6 +1515,7 @@ $(document).one("ajaxStop", function () {
   });
 
   sitesBH.initialize();
+  imeiBH.initialize();
   geonamesBH.initialize();
 
   /* instantiate the typeahead UI */
@@ -1413,8 +1529,14 @@ $(document).one("ajaxStop", function () {
     source: sitesBH.ttAdapter(),
     templates: {
       header: "<h4 class='typeahead-header'><img src='assets/img/factory.png' width='24' height='28'>&nbsp;Sites</h4>"
-    }
-  
+	}
+  }, {
+    name: "Telephones",
+    displayKey: "name",
+    source: imeiBH.ttAdapter(),
+    templates: {
+      header: "<h4 class='typeahead-header'><i class='fa fa-phone'></i>&nbsp;Téléphones</h4>"
+  	}
   }, {
     name: "GeoNames",
     displayKey: "name",
@@ -1423,10 +1545,16 @@ $(document).one("ajaxStop", function () {
       header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;GeoNames</h4>"
     }
   }).on("typeahead:selected", function (obj, datum) {
-     if (datum.source === "Site_datas") {
+    if (datum.source === "Site_datas") {
       map.fitBounds(datum.bounds);
     }
-    if (datum.source === "GeoNames") {
+    if (datum.source === "Telephones") {
+       //map.setView([datum.lat, datum.lng], 14);
+		$("#searchbox").val(datum.search);
+		$("#searchbox").keypress(" ");
+
+    }
+	if (datum.source === "GeoNames") {
       map.setView([datum.lat, datum.lng], 14);
     }
     if ($(".navbar-collapse").height() > 50) {
