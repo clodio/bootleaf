@@ -502,6 +502,21 @@ var mapquestOAM = L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.
   subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"],
   attribution: 'Tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>. Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency'
 });
+var mapquestStamenToner = L.tileLayer("http://{S}.tiles.stamen.com/toner/{Z}/{X}/{Y}.jpg", {
+  maxZoom: 18,
+  subdomains: ["a", "b", "c", "d"],
+  attribution: 'Design by Shawn Allen at <a href="http://stamen.com/">Stamen</a>, Data courtesy of <a href="http://fuf.net/">FuF</a>,<a href="http://www.yellowcabsf.com/">Yellow Cab</a>'
+});
+var mapquestStamenTerrain = L.tileLayer("http://{S}.tiles.stamen.com/terrain/{Z}/{X}/{Y}.jpg", {
+  maxZoom: 18,
+  subdomains: ["a", "b", "c", "d"],
+  attribution: 'Design by Shawn Allen at <a href="http://stamen.com/">Stamen</a>, Data courtesy of <a href="http://fuf.net/">FuF</a>,<a href="http://www.yellowcabsf.com/">Yellow Cab</a>'
+});
+var mapquestStamenWaterColor = L.tileLayer("http://{S}.tiles.stamen.com/watercolor/{Z}/{X}/{Y}.jpg", {
+  maxZoom: 18,
+  subdomains: ["a", "b", "c", "d"],
+  attribution: 'Design by Shawn Allen at <a href="http://stamen.com/">Stamen</a>, Data courtesy of <a href="http://fuf.net/">FuF</a>,<a href="http://www.yellowcabsf.com/">Yellow Cab</a>'
+});
 
 var LMappopulation = new L.TileLayer("http://www.comeetie.fr/mbtiles-php/CarreauxPopShpSmall/{z}/{x}/{y}.png", {
 	minZoom : 6,
