@@ -741,35 +741,35 @@ function renderMapLegend(min, max, style_map_color) {
     var legenditems = legenddiv.selectAll('.legenditem');
 
 	if (style_map_color == "DIV12") {
-	 	var me = legenddiv.append('div');me.append('span').attr('style','background-color:#8e0152').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(95*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#c51b7d').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(85*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#de77ae').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(75*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#f1b6da').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(65*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fde0ef').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(55*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#f7f7f7').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(45*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#e6f5d0').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(35*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#b8e186').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(25*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#7fbc41').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(15*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#4d9221').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(5*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#276419').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' < ' + numberFormat(Math.round(5*(max-min)+min)));
+	 	var me = legenddiv.append('div');me.append('span').attr('style','background-color:#8e0152').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(95*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#c51b7d').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(85*(max-min/100)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#de77ae').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(75*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#f1b6da').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(65*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fde0ef').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(55*(max-min/100)+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#f7f7f7').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(45*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#e6f5d0').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(35*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#b8e186').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(25*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#7fbc41').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(15*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#4d9221').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(5*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#276419').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' < ' + numberFormat(Math.round(5*(max-min)/100+min)));
 	}
 	else if (style_map_color == "DIV6") {
 		// DIV6 color
-	 	var me = legenddiv.append('div');me.append('span').attr('style','background-color:#d73027').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(80*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fc8d59').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(60*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fee08b').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(40*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#d9ef8b').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(20*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#91cf60').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(5*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#111').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' < ' + numberFormat(Math.round(5*(max-min)+min)));
+	 	var me = legenddiv.append('div');me.append('span').attr('style','background-color:#d73027').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(80*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fc8d59').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(60*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fee08b').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(40*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#d9ef8b').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(20*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#91cf60').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(5*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#111').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' < ' + numberFormat(Math.round(5*(max-min)/100+min)));
 	}
 	else {
 		//"PiYG6", 
-	 	var me = legenddiv.append('div');me.append('span').attr('style','background-color:#8e0152').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(80*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#de77ae').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(60*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fde0ef').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(40*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#b8e186').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(20*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#4dac26').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(5*(max-min)+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#111').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' < ' + numberFormat(Math.round(5*(max-min)+min)));
+	 	var me = legenddiv.append('div');me.append('span').attr('style','background-color:#8e0152').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(80*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#de77ae').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(60*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fde0ef').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(40*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#b8e186').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(20*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#4dac26').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(5*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#111').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' < ' + numberFormat(Math.round(5*(max-min)/100+min)));
 
 
 	}
