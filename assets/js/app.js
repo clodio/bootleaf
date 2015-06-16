@@ -404,6 +404,71 @@ $("#sidebar-hide-btn").click(function() {
   map.invalidateSize();
 });
 
+//manage local csv files import
+$('#validate_csv_import').click(function()
+	{
+		if ($(this).prop('disabled') == "true")
+			return;
+
+		stepped = 0;
+		rowCount = 0;
+		errorCount = 0;
+		firstError = undefined;
+
+		var config = {
+			delimiter: ';',
+			header: true, //Keys data by field name rather than an array.
+			dynamicTyping: true, //Turns numeric data into numbers and true/false into booleans.
+			skipEmptyLines: false,
+			preview: 0,
+			//step: $('#stream').prop('checked') ? stepFn : undefined,
+			encoding: "UTF-8",
+			worker: true, //Uses a separate thread so the web page doesn t lock up.
+			comments: '', //If specified, skips lines starting with this string.
+			complete: function(results, file) {
+					console.log("Parsing complete:", results, file);
+				},
+			//error: errorFn,
+			download: "local"
+		};
+		var input = $('#csv_import').val();
+
+		// Allow only one parse at a time
+		$(this).prop('disabled', true);
+
+		
+
+			if (!$('#csv_import')[0].files.length)
+			{
+				alert("Please choose at least one file to parse.");
+				$('#validate_csv_import').prop('disabled', false);
+				return true;
+			}
+			
+			$('#csv_import').parse({
+				config: config,
+				before: function(file, inputElem)
+				{
+					//start = now();
+					console.log("Parsing file...", file);
+				},
+				error: function(err, file)
+				{
+					console.log("ERROR:", err, file);
+					firstError = firstError || err;
+					errorCount++;
+				},
+				complete: function()
+				{
+					//end = now();
+					printStats("Done with all files");
+				}
+			});
+		
+	});
+
+
+
 function sizeLayerControl() {
   $(".leaflet-control-layers").css("max-height", $("#map").height() - 50);
 }
