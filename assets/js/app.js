@@ -502,20 +502,31 @@ var mapquestOAM = L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.
   subdomains: ["oatile1", "oatile2", "oatile3", "oatile4"],
   attribution: 'Tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>. Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency'
 });
-var mapquestStamenToner = L.tileLayer("http://{S}.tiles.stamen.com/toner/{Z}/{X}/{Y}.jpg", {
-  maxZoom: 18,
-  subdomains: ["a", "b", "c", "d"],
-  attribution: 'Design by Shawn Allen at <a href="http://stamen.com/">Stamen</a>, Data courtesy of <a href="http://fuf.net/">FuF</a>,<a href="http://www.yellowcabsf.com/">Yellow Cab</a>'
+var mapStamenToner = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+	subdomains: 'abcd',
+	minZoom: 0,
+	maxZoom: 20,
+	ext: 'png'
 });
-var mapquestStamenTerrain = L.tileLayer("http://{S}.tiles.stamen.com/terrain/{Z}/{X}/{Y}.jpg", {
-  maxZoom: 18,
-  subdomains: ["a", "b", "c", "d"],
-  attribution: 'Design by Shawn Allen at <a href="http://stamen.com/">Stamen</a>, Data courtesy of <a href="http://fuf.net/">FuF</a>,<a href="http://www.yellowcabsf.com/">Yellow Cab</a>'
+var mapStamenWaterColor = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+	subdomains: 'abcd',
+	minZoom: 1,
+	maxZoom: 16,
+	ext: 'png'
 });
-var mapquestStamenWaterColor = L.tileLayer("http://{S}.tiles.stamen.com/watercolor/{Z}/{X}/{Y}.jpg", {
-  maxZoom: 18,
-  subdomains: ["a", "b", "c", "d"],
-  attribution: 'Design by Shawn Allen at <a href="http://stamen.com/">Stamen</a>, Data courtesy of <a href="http://fuf.net/">FuF</a>,<a href="http://www.yellowcabsf.com/">Yellow Cab</a>'
+var mapIgn = L.tileLayer(	"http://wxs.ign.fr/a94tzjkkqaryzdy11uc6jmb1/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image%2Fjpeg", {
+	attribution: 'Map tiles by &copy; <a href="http://www.ign.fr/">IGN</a>',
+	minZoom: 1,
+	maxZoom: 18,
+	ext: 'jpg'
+});
+var mapIgnCadastre = L.tileLayer(	"http://wxs.ign.fr/a94tzjkkqaryzdy11uc6jmb1/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image%2Fjpeg", {
+	attribution: 'Map tiles by &copy; <a href="http://www.ign.fr/">IGN</a>',
+	minZoom: 1,
+	maxZoom: 18,
+	ext: 'jpg'
 });
 
 var LMappopulation = new L.TileLayer("http://www.comeetie.fr/mbtiles-php/CarreauxPopShpSmall/{z}/{x}/{y}.png", {
@@ -1313,6 +1324,10 @@ var baseLayers = {
   "Plan": mapquestOSM,
   "Carte satellite": mapquestOAM,
   "Carte avec rues": mapquestHYB,
+  "Plan N&B": mapStamenToner,
+  "Map WaterColor": mapStamenWaterColor,
+  "Plan IGN": mapIgn,
+  "Carte IGN Satellite": mapIgnCadastre,
   //"% de bas revenus": LMaplowIncomes,
   "% de moins de 25 ans": LMapless25YearsOld,
   "% de 65 ans et plus": LMapplus65YearsOld,
