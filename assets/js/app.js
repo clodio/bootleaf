@@ -766,7 +766,7 @@ function renderMapLegend(min, max, style_map_color) {
 		//"PiYG6", 
 	 	var me = legenddiv.append('div');me.append('span').attr('style','background-color:#8e0152').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(80*(max-min)/100+min)));
 		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#de77ae').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(60*(max-min)/100+min)));
-		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#fde0ef').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(40*(max-min)/100+min)));
+		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#9D87D3').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(40*(max-min)/100+min)));
 		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#b8e186').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(20*(max-min)/100+min)));
 		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#4dac26').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' > ' + numberFormat(Math.round(5*(max-min)/100+min)));
 		var me = legenddiv.append('div');me.append('span').attr('style','background-color:#111').attr('width','15px').html('&nbsp;&nbsp;&nbsp;');me.append('span').text(' < ' + numberFormat(Math.round(5*(max-min)/100+min)));
@@ -783,7 +783,7 @@ function getColor(d, style_map_color) {
 	    
 	    return d > 80 ? '#8e0152' :
 		   d > 60  ? '#de77ae' :
-		   d > 40  ? '#fde0ef' :
+		   d > 40  ? '#9D87D3' :
 		   d > 20  ? '#b8e186' :
 		   d > 5   ? '#4dac26' :
 		              '#111';
