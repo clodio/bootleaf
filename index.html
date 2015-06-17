@@ -99,8 +99,7 @@
     "filtered": {
       "query": {
         "query_string": {
-          "analyze_wildcard": true,
-          "query": "*"
+          "query": "partid AND code:200 AND _type:trz-datapower-facteo"
         }
       },
       "filter": {
@@ -109,8 +108,8 @@
             {
               "range": {
                 "@timestamp": {
-                  "gte": "2000-06-18",
-                  "lte": "now/d"
+                  "gte": "now-1d/d",
+                  "lte": "now"
                 }
               }
             }
@@ -124,7 +123,28 @@
   "aggs": {
     "my_agg": {
       "terms": {
-        "field": "bytes.raw"
+        "field": "ajout",
+        "size": 0
+      },
+      "aggs": {
+        "sub_agg": {
+          "cardinality": {
+            "field": "imei"
+          }
+        },
+        "sub_sub_agg": {
+          "terms": {
+            "field": "operator",
+            "size": 0
+          },
+          "aggs": {
+            "sub_agg": {
+              "cardinality": {
+                "field": "imei"
+              }
+            }
+          }
+        }
       }
     }
   }
