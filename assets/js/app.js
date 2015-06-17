@@ -99,8 +99,13 @@ function defineFeaturePopup(feature, layer) {
 		content = content +"<tr><th>"+key+"</th><td>" + feature.properties.data[key] + "</td></tr>";
 	}
 
-	content = content +"<table><iframe src=\"http://localhost:5601/#/dashboard/New-Dashboard?embed&_g=(refreshInterval:(display:Off,section:0,value:0),time:(from:'2015-05-29T13:01:13.587Z',mode:absolute,to:'2015-05-29T14:03:40.226Z'))&_a=(filters:!(),panels:!((col:1,id:carto1,row:1,size_x:3,size_y:2,type:visualization),(col:4,id:facet,row:1,size_x:3,size_y:2,type:visualization),(col:7,id:New-Visualization,row:1,size_x:3,size_y:2,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'*')),title:'New%20Dashboard')\" height=\"600\" width=\"800\"></iframe>";
-
+	content = content +"<table><iframe src=\"https://admin:salami@monitoring.facteo-gene.net-courrier.extra.laposte.fr/kibana4/#/visualize/edit/CSE_partid_par_site?embed&_g=(time:(from:now-7d,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'ressource_api:partid%20AND%20code:200%20AND%20mob_regate:" + feature.properties.regate_code + "')),vis:(aggs:!((id:'1',params:(field:imei.raw),schema:metric,type:cardinality),(id:'2',params:(extended_bounds:(),field:'@timestamp',interval:hour,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTooltip:!t,defaultYExtents:!f,mode:stacked,shareYAxis:!t),type:histogram))\" height=\"300\" width=\"568\"></iframe>";
+	content = content +"<iframe src=\"https://admin:salami@monitoring.facteo-gene.net-courrier.extra.laposte.fr/kibana4/#/visualize/edit/CSE_prestations_par_site?embed&_g=(time:(from:now-7d,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'ressource_api:bordereauprestrace%20AND%20code:200%20AND%20mob_regate:" + feature.properties.regate_code + "')),vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(extended_bounds:(),field:'@timestamp',interval:hour,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTooltip:!t,defaultYExtents:!f,mode:stacked,shareYAxis:!t),type:histogram))\" height=\"300\" width=\"568\"></iframe>";
+	
+	content = content +"<iframe src=\"https://admin:salami@monitoring.facteo-gene.net-courrier.extra.laposte.fr/kibana4/#/visualize/edit/CSE_identifiants_telephone_par_site?embed&_g=(time:(from:now-7d,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'mob_regate:" + feature.properties.regate_code + "')),vis:(aggs:!((id:'1',params:(field:imei.raw),schema:metric,type:cardinality),(id:'2',params:(field:imei.raw,order:desc,orderBy:'1',size:200),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f),type:table))\" height=\"300\" width=\"568\"></iframe>";
+	
+	content = content +"</table>";
+	
 	layer.on({
         click: function (e) {
           $("#feature-title").html(feature.properties.regate_code + " " +feature.properties.entity_name);
@@ -876,8 +881,16 @@ var site_datas = L.geoJson(null, {
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
 																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																			
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Code Regate</th><td><a href='http://www.source-organisation.courrier.intra.laposte.fr:8080/ebx/?redirect=/source-organisation/view/close.jsp&branch=BrancheSourceOrganisation&instance=InstanceSourceOrganisation&xpath=/root/D_ENTITE/T_ENTITE[./i_CODE="+ feature.properties.id +"]' target='_blanck'>" + feature.properties.regate_code + "</a></td></tr>" + "<tr><th>Nom</th><td>" + feature.properties.entity_name + "</td></tr>" + "<tr><th>Valeur</th><td>" + feature.properties.value + "</td></tr>" + "<table><iframe src=\"http://localhost:5601/#/dashboard/New-Dashboard?embed&_g=(refreshInterval:(display:Off,section:0,value:0),time:(from:'2015-05-29T13:01:13.587Z',mode:absolute,to:'2015-05-29T14:03:40.226Z'))&_a=(filters:!(),panels:!((col:1,id:carto1,row:1,size_x:3,size_y:2,type:visualization),(col:4,id:facet,row:1,size_x:3,size_y:2,type:visualization),(col:7,id:New-Visualization,row:1,size_x:3,size_y:2,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'*')),title:'New%20Dashboard')\" height=\"600\" width=\"800\"></iframe>";
-    																																																																																							  
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Code Regate</th><td><a href='http://www.source-organisation.courrier.intra.laposte.fr:8080/ebx/?redirect=/source-organisation/view/close.jsp&branch=BrancheSourceOrganisation&instance=InstanceSourceOrganisation&xpath=/root/D_ENTITE/T_ENTITE[./i_CODE="+ feature.properties.id +"]' target='_blanck'>" + feature.properties.regate_code + "</a></td></tr>" + "<tr><th>Nom</th><td>" + feature.properties.entity_name + "</td></tr>" + "<tr><th>Valeur</th><td>" + feature.properties.value + "</td></tr>" + "<table>";
+      
+      
+      	content = content +"<table><iframe src=\"https://admin:salami@monitoring.facteo-gene.net-courrier.extra.laposte.fr/kibana4/#/visualize/edit/CSE_partid_par_site?embed&_g=(time:(from:now-7d,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'ressource_api:partid%20AND%20code:200%20AND%20mob_regate:" + feature.properties.regate_code + "')),vis:(aggs:!((id:'1',params:(field:imei.raw),schema:metric,type:cardinality),(id:'2',params:(extended_bounds:(),field:'@timestamp',interval:hour,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTooltip:!t,defaultYExtents:!f,mode:stacked,shareYAxis:!t),type:histogram))\" height=\"300\" width=\"568\"></iframe>";
+				content = content +"<iframe src=\"https://admin:salami@monitoring.facteo-gene.net-courrier.extra.laposte.fr/kibana4/#/visualize/edit/CSE_prestations_par_site?embed&_g=(time:(from:now-7d,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'ressource_api:bordereauprestrace%20AND%20code:200%20AND%20mob_regate:" + feature.properties.regate_code + "')),vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(extended_bounds:(),field:'@timestamp',interval:hour,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTooltip:!t,defaultYExtents:!f,mode:stacked,shareYAxis:!t),type:histogram))\" height=\"300\" width=\"568\"></iframe>";
+				
+				content = content +"<iframe src=\"https://admin:salami@monitoring.facteo-gene.net-courrier.extra.laposte.fr/kibana4/#/visualize/edit/CSE_identifiants_telephone_par_site?embed&_g=(time:(from:now-7d,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'mob_regate:" + feature.properties.regate_code + "')),vis:(aggs:!((id:'1',params:(field:imei.raw),schema:metric,type:cardinality),(id:'2',params:(field:imei.raw,order:desc,orderBy:'1',size:200),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f),type:table))\" height=\"300\" width=\"568\"></iframe>";
+				
+				content = content +"</table>";
+      																																																																	  
 // layer.on('mouseover mousemove', function(e){
 //ne marche pas !!!!!!
 //    highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
@@ -922,6 +935,7 @@ function decodeURL () {
 	
 	if (typeof(getURLParameter('url')) == "undefined" ||  getURLParameter('url') == "" ) {
 		return "http://kibana-ist.net2-courrier.extra.laposte.fr:9200/_search";
+		//return "https://admin:salami@monitoring.facteo-gene.net-courrier.extra.laposte.fr/admin/_search";
 	}	
 	else {
 		return decodeURIComponent(getURLParameter('url')).toString();
@@ -950,11 +964,25 @@ function requestData () {
 	}
 	if (data_request !== "") {
 	
+	//$.ajaxSetup({
+  //  headers: { 'Authorization': "Basic YWRtaW46c2FsYW1p" }
+	//});
 		//var request = $('#data_request').val();
 		//todo : add json validtor error
 		//var requestJson = JSON.parse(request);
-
-		// var data = $.post( {"url": decodeURL(), "crossDomain":true, "beforeSend": function (xhr) {xhr.setRequestHeader ("Authorization", "Basic XXXXXX");}, "data": data_request}, function(data_regate) {
+  var request_data = {url: decodeURL(), 
+  									headers: {
+    										Authorization: 'Basic YWRtaW46c2FsYW1p'},
+                   // crossDomain:true, 
+                    //dataType: 'jsonp',
+                    data:data_request
+                     };
+  
+  // beforeSend: function (xhr) {xhr.setRequestHeader ("Authorization", "Basic YWRtaW46c2FsYW1p");}
+                     
+                    
+  //console.log(request_data)
+		// var data = $.post( decodeURL(), request_data, function(data_regate) {
 		var data = $.post(  decodeURL(), data_request, function(data_regate) {
 		//var data = $.getJSON( "data/sample_CA_debut_2014.geojson", function(data_regate) {
 				
