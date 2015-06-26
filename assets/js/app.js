@@ -510,7 +510,7 @@ $( document ).ready(function() {
 	}
 	if (typeof(getURLParameter('title')) != "undefined" &&  getURLParameter('title') != "" ) {
 		$('#title').val(decodeURIComponent(getURLParameter('title')));
-		renderTitle($('#title').val());
+		renderTitle(decodeURIComponent($('#title').val()));
 	}
 //var tmpDate = new Date();console.log( tmpDate.getHours() + ":" + tmpDate.getMinutes() + ":" + tmpDate.getSeconds() + " " + "end ready" );
 });
